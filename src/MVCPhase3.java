@@ -7,14 +7,26 @@
  * with the computer. 
  * 
  ***********************************************************************/
+
 public class MVCPhase3 
 {
    public static void main(String[] args)
    {
-      GameModel gameModel = new GameModel();
-      GameView gameView = new GameView();
+      final int NUM_CARDS_PER_HAND = 7;
+      final int NUM_PLAYERS = 2;
+      int numPacksPerDeck = 1;
+      int numJokersPerPack = 4;
+      int numUnusedCardsPerPack = 0;
+      Card[] unusedCardsPerPack = null;
+      
+      // Create the model
+      GameModel gameModel = new GameModel(numPacksPerDeck, numJokersPerPack, 
+         numUnusedCardsPerPack, unusedCardsPerPack, NUM_PLAYERS, NUM_CARDS_PER_HAND);
+      
+      // Create the view
+      GameView gameView = new GameView(NUM_CARDS_PER_HAND, NUM_PLAYERS);
 
+      // Create the controller 
       GameController gameController = new GameController(gameModel, gameView);
-
    }
 }

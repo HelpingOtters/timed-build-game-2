@@ -1,63 +1,190 @@
 import java.util.Random;
 import javax.swing.*;
 
+/****************************************************************
+ * GameModel
+ * 
+ * Description:  Creates the model for a card game  
+ * Usage:        Manages the data of the card game
+ *****************************************************************/
+
 public class GameModel
 {
-   CardGameFramework LowCardGame;
-   private int HUMAN_INDEX = 1;
-   private int COMP_INDEX = 0;
+   private CardGameFramework LowCardGame;
+   
+   // Variables to keep track of winnings
    private int computerWinningsCounter = 0;
    private int humanWinningsCounter = 0;
+   private Card[] compWinnings;
+   private Card[] humanWinnings;
 
-
-   public GameModel(){}
-
-   public void startNewGame(int numPacks, int numJokersPerPack, 
+   /** 
+    * Constructor that takes arguments to create a new game
+    * @param numPacks
+    * @param numJokersPerPack
+    * @param numUnusedCardsPerPack
+    * @param unusedCardsPerPack
+    * @param numPlayers
+    * @param numCardsPerHand
+    */
+   public GameModel(int numPacks, int numJokersPerPack, 
       int numUnusedCardsPerPack, Card[] unusedCardsPerPack, int numPlayers, 
       int numCardsPerHand)
    {
-      System.out.println("In game model");
-
       LowCardGame = new CardGameFramework(
          numPacks, numJokersPerPack, numUnusedCardsPerPack, unusedCardsPerPack,
          numPlayers, numCardsPerHand
          );
+      compWinnings = new Card[LowCardGame.getNumCardsRemainingInDeck() * numPlayers];
+      humanWinnings = new Card[LowCardGame.getNumCardsRemainingInDeck() * numPlayers];
+   }
 
+   /** 
+    * Loads all the card icons to be used later and deals the deck
+    */
+   public void startNewGame()
+   {
       GUICard.loadCardIcons();
 
       LowCardGame.deal();
    }
 
-   public Icon[] getPlayerIcons()
+   /**
+    * Retrieves all the icons associated with the player's current hand
+    * @param playerIndex indicates which player
+    * @return an array of icons, one for each card in the player's hand
+    */
+   public Icon[] loadHandIcons(int playerIndex)
    {
-      int numCardsInHand = LowCardGame.getHand(HUMAN_INDEX).getNumCards();
-      Icon[] playerIcons = new Icon[numCardsInHand];
+      int numHumanCards = getNumCardsInHand(playerIndex);
+      Icon[] playerIcons = new Icon[numHumanCards];
       Card currCard;
 
-      for (int card = 0; card < numCardsInHand; card++)
+      for (int card = 0; card < numHumanCards; card++)
       {
-         currCard = LowCardGame.getHand(HUMAN_INDEX).inspectCard(card);
+         currCard = LowCardGame.getHand(playerIndex).inspectCard(card);
          playerIcons[card] = GUICard.getIcon(currCard);
       }
 
       return playerIcons;
    }
-
-   public Icon getCompIcon()
+   
+   // Retrieves the back card icon
+   public Icon getBackCardIcon()
    {
       return GUICard.getBackCardIcon();
    }
+   
+   /**
+    * Determines the winner of the round and returns an int specifying who won
+    * @param compCard
+    * @param humanCard
+    * @return 0 if computer won
+    * @return 1 if human won
+    * @return -1 if its a tie
+    */
+   public int determineRoundWinner(Card compCard, Card humanCard)
+   {
+      
+      // Check who won this round 
+      if(Card.valueAsInt(compCard) < Card.valueAsInt(humanCard))
+      {
+         // Computer won this round
+         compWinnings[computerWinningsCounter] = compCard;
+         compWinnings[computerWinningsCounter + 1] = humanCard;
+         computerWinningsCounter += 2;
+         return 0;
+      }
+      else if(Card.valueAsInt(compCard) > Card.valueAsInt(humanCard))
+      {
+         // Human won this round
+         humanWinnings[humanWinningsCounter] = compCard;
+         humanWinnings[humanWinningsCounter + 1] = humanCard;
+         humanWinningsCounter += 2;
+         return 1;
+      }   
+      else
+      {
+         // There was a tie
+         return -1;
+      }
+   }
+   
+   /**
+    * Checks if the game is over by checking if the player's hand is empty
+    * @param playerIndex
+    * @return boolean
+    */
+   public boolean isGameOver(int playerIndex)
+   {
+      if(LowCardGame.getHand(playerIndex).getNumCards() == 0)
+      {
+         return true;
+      }
+      return false;
+   }
+   
+   /**
+    * Retrieves the specified player's total score
+    * @param playerIndex
+    * @return the player's score
+    */
+   public int getPlayerScore(int playerIndex)
+   {
+      // Check who won 
+      if(playerIndex == 0)
+         return computerWinningsCounter; 
+      
+      else if(playerIndex == 1)
+         return humanWinningsCounter;
+  
+      else
+         return -1; // If input is incorrect
+   }
 
+   // Returns the number of cards in a players hand
    public int getNumCardsInHand(int playerIndex)
    {
       return LowCardGame.getHand(playerIndex).getNumCards();
    }
    
-   public void sort(int playerIndex)
+   // Returns the number of players in the current game
+   public int getNumPlayers()
+   {
+      return LowCardGame.getNumPlayers();
+   }
+   
+   // Sorts the specified player's hand
+   public void sortHand(int playerIndex)
    {
       LowCardGame.getHand(playerIndex).sort();
    }
+   
+   // Plays the indicated card for the player
+   public Card playCard(int playerIndex, int cardIndex)
+   {
+      return LowCardGame.playCard(playerIndex, cardIndex);
+   }
+   
+   // Takes a card from the deck and gives it to the specified player
+   public boolean takeCard(int playerIndex)
+   {
+      return LowCardGame.takeCard(playerIndex);
+   }
+   
+   // Retrieves the Icon for the specified Card
+   public Icon getCardIcon(Card card)
+   {
+      return GUICard.getIcon(card);
+      
+   }
 }
+
+/*-----------------------------------------------------
+ * End Of GameModel class
+ *-----------------------------------------------/
+
+
 
 /****************************************
  * CardGameFrameWork class
@@ -237,6 +364,10 @@ class CardGameFramework
    }
 
 }
+/*-----------------------------------------------------
+ * End Of CardGameFramework
+ *-----------------------------------------------/
+
 
 
  /****************************************************************
@@ -270,12 +401,12 @@ class GUICard
       {
          for (int j = 0; j < cardSuits.length; ++j) 
          {
-            filename = "images/" + Card.valuRanks[i] + cardSuits[j] + ".gif";
+            filename = "src/images/" + Card.valuRanks[i] + cardSuits[j] + ".gif";
             iconCards[i][j] = new ImageIcon(filename);
          }
       }
       // fills the back of card
-      iconBack = new ImageIcon("images/BK.gif");
+      iconBack = new ImageIcon("src/images/BK.gif");
       iconsLoaded = true;
    }
 
