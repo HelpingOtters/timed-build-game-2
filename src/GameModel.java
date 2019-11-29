@@ -10,13 +10,25 @@ import javax.swing.*;
 
 public class GameModel
 {
-   private CardGameFramework LowCardGame;
+   private static final int MAX_PLAYERS = 50;
    
+   private int numPlayers;
+   private int numPacks; // # standard 52-card packs per deck
+   // ignoring jokers or unused cards
+   private int numJokersPerPack; // if 2 per pack & 3 packs per deck, get 6
+   private int numUnusedCardsPerPack; // # cards removed from each pack
+   private int numCardsPerHand; // # cards to deal each player
+   private Deck deck; // holds the initial full deck and gets
+   // smaller (usually) during play
+   private Hand[] hand; // one Hand for each player
+   private Card[] unusedCardsPerPack; // an array holding the cards not used
+
    // Variables to keep track of winnings
    private int computerWinningsCounter = 0;
    private int humanWinningsCounter = 0;
    private Card[] compWinnings;
    private Card[] humanWinnings;
+   
 
    /** 
     * Constructor that takes arguments to create a new game
@@ -28,188 +40,11 @@ public class GameModel
     * @param numCardsPerHand
     */
    public GameModel(int numPacks, int numJokersPerPack, 
-      int numUnusedCardsPerPack, Card[] unusedCardsPerPack, int numPlayers, 
-      int numCardsPerHand)
+      int numUnusedCardsPerPack, Card[] unusedCardsPerPack,
+      int numPlayers, int numCardsPerHand) 
    {
-      LowCardGame = new CardGameFramework(
-         numPacks, numJokersPerPack, numUnusedCardsPerPack, unusedCardsPerPack,
-         numPlayers, numCardsPerHand
-         );
-      compWinnings = new Card[LowCardGame.getNumCardsRemainingInDeck() * numPlayers];
-      humanWinnings = new Card[LowCardGame.getNumCardsRemainingInDeck() * numPlayers];
-   }
 
-   /** 
-    * Loads all the card icons to be used later and deals the deck
-    */
-   public void startNewGame()
-   {
-      GUICard.loadCardIcons();
-
-      LowCardGame.deal();
-   }
-
-   /**
-    * Retrieves all the icons associated with the player's current hand
-    * @param playerIndex indicates which player
-    * @return an array of icons, one for each card in the player's hand
-    */
-   public Icon[] loadHandIcons(int playerIndex)
-   {
-      int numHumanCards = getNumCardsInHand(playerIndex);
-      Icon[] playerIcons = new Icon[numHumanCards];
-      Card currCard;
-
-      for (int card = 0; card < numHumanCards; card++)
-      {
-         currCard = LowCardGame.getHand(playerIndex).inspectCard(card);
-         playerIcons[card] = GUICard.getIcon(currCard);
-      }
-
-      return playerIcons;
-   }
-   
-   // Retrieves the back card icon
-   public Icon getBackCardIcon()
-   {
-      return GUICard.getBackCardIcon();
-   }
-   
-   /**
-    * Determines the winner of the round and returns an int specifying who won
-    * @param compCard
-    * @param humanCard
-    * @return 0 if computer won
-    * @return 1 if human won
-    * @return -1 if its a tie
-    */
-   public int determineRoundWinner(Card compCard, Card humanCard)
-   {
-      
-      // Check who won this round 
-      if(Card.valueAsInt(compCard) < Card.valueAsInt(humanCard))
-      {
-         // Computer won this round
-         compWinnings[computerWinningsCounter] = compCard;
-         compWinnings[computerWinningsCounter + 1] = humanCard;
-         computerWinningsCounter += 2;
-         return 0;
-      }
-      else if(Card.valueAsInt(compCard) > Card.valueAsInt(humanCard))
-      {
-         // Human won this round
-         humanWinnings[humanWinningsCounter] = compCard;
-         humanWinnings[humanWinningsCounter + 1] = humanCard;
-         humanWinningsCounter += 2;
-         return 1;
-      }   
-      else
-      {
-         // There was a tie
-         return -1;
-      }
-   }
-   
-   /**
-    * Checks if the game is over by checking if the player's hand is empty
-    * @param playerIndex
-    * @return boolean
-    */
-   public boolean isGameOver(int playerIndex)
-   {
-      if(LowCardGame.getHand(playerIndex).getNumCards() == 0)
-      {
-         return true;
-      }
-      return false;
-   }
-   
-   /**
-    * Retrieves the specified player's total score
-    * @param playerIndex
-    * @return the player's score
-    */
-   public int getPlayerScore(int playerIndex)
-   {
-      // Check who won 
-      if(playerIndex == 0)
-         return computerWinningsCounter; 
-      
-      else if(playerIndex == 1)
-         return humanWinningsCounter;
-  
-      else
-         return -1; // If input is incorrect
-   }
-
-   // Returns the number of cards in a players hand
-   public int getNumCardsInHand(int playerIndex)
-   {
-      return LowCardGame.getHand(playerIndex).getNumCards();
-   }
-   
-   // Returns the number of players in the current game
-   public int getNumPlayers()
-   {
-      return LowCardGame.getNumPlayers();
-   }
-   
-   // Sorts the specified player's hand
-   public void sortHand(int playerIndex)
-   {
-      LowCardGame.getHand(playerIndex).sort();
-   }
-   
-   // Plays the indicated card for the player
-   public Card playCard(int playerIndex, int cardIndex)
-   {
-      return LowCardGame.playCard(playerIndex, cardIndex);
-   }
-   
-   // Takes a card from the deck and gives it to the specified player
-   public boolean takeCard(int playerIndex)
-   {
-      return LowCardGame.takeCard(playerIndex);
-   }
-   
-   // Retrieves the Icon for the specified Card
-   public Icon getCardIcon(Card card)
-   {
-      return GUICard.getIcon(card);
-      
-   }
-}
-
-/*-----------------------------------------------------
- * End Of GameModel class
- *-----------------------------------------------/
-
-
-
-/****************************************
- * CardGameFrameWork class
- *****************************************/
-class CardGameFramework 
-{
-   private static final int MAX_PLAYERS = 50;
-
-   private int numPlayers;
-   private int numPacks; // # standard 52-card packs per deck
-                         // ignoring jokers or unused cards
-   private int numJokersPerPack; // if 2 per pack & 3 packs per deck, get 6
-   private int numUnusedCardsPerPack; // # cards removed from each pack
-   private int numCardsPerHand; // # cards to deal each player
-   private Deck deck; // holds the initial full deck and gets
-                      // smaller (usually) during play
-   private Hand[] hand; // one Hand for each player
-   private Card[] unusedCardsPerPack; // an array holding the cards not used
-                                      // in the game. e.g. pinochle does not
-                                      // use cards 2-8 of any suit
-
-   public CardGameFramework(int numPacks, int numJokersPerPack, int numUnusedCardsPerPack, Card[] unusedCardsPerPack,
-         int numPlayers, int numCardsPerHand) {
       int k;
-
       // filter bad values
       if (numPacks < 1 || numPacks > 6)
          numPacks = 1;
@@ -240,37 +75,30 @@ class CardGameFramework
          this.unusedCardsPerPack[k] = unusedCardsPerPack[k];
 
       // prepare deck and shuffle
-      newGame();
-   }
+      initGame();
 
+      compWinnings = new Card[getNumCardsRemainingInDeck() * numPlayers];
+      humanWinnings = new Card[getNumCardsRemainingInDeck() * numPlayers];
+   }
+   
    // constructor overload/default for game like bridge
-   public CardGameFramework() 
+   public GameModel() 
    {
       this(1, 0, 0, null, 4, 13);
    }
 
-   public Hand getHand(int k) 
+   /** 
+    * Loads all the card icons to be used later and deals the deck
+    */
+   public void startNewGame()
    {
-      // hands start from 0 like arrays
+      GUICard.loadCardIcons();
 
-      // on error return automatic empty hand
-      if (k < 0 || k >= numPlayers)
-         return new Hand();
-
-      return hand[k];
+      deal();
    }
-
-   public Card getCardFromDeck() 
-   {
-      return deck.dealCard();
-   }
-
-   public int getNumCardsRemainingInDeck() 
-   {
-      return deck.getNumCards();
-   }
-
-   public void newGame() 
+   
+   // create a new deck and the correct number of hands. Shuffle the deck.
+   public void initGame() 
    {
       int k, j;
 
@@ -294,6 +122,7 @@ class CardGameFramework
       deck.shuffle();
    }
 
+   // deal the specified number of cards to each hand
    public boolean deal() 
    {
       // returns false if not enough cards, but deals what it can
@@ -319,14 +148,34 @@ class CardGameFramework
       return enoughCards;
    }
 
-   void sortHands() {
-      int k;
+   /**
+    * Retrieves all the icons associated with the player's current hand
+    * @param playerIndex indicates which player
+    * @return an array of icons, one for each card in the player's hand
+    */
+   public Icon[] loadHandIcons(int playerIndex)
+   {
+      int numHumanCards = getNumCardsInHand(playerIndex);
+      Icon[] playerIcons = new Icon[numHumanCards];
+      Card currCard;
 
-      for (k = 0; k < numPlayers; k++)
-         hand[k].sort();
+      for (int card = 0; card < numHumanCards; card++)
+      {
+         currCard = getHand(playerIndex).inspectCard(card);
+         playerIcons[card] = GUICard.getIcon(currCard);
+      }
+
+      return playerIcons;
    }
 
-   Card playCard(int playerIndex, int cardIndex) 
+   // Retrieves the back card icon
+   public Icon getBackCardIcon()
+   {
+      return GUICard.getBackCardIcon();
+   }
+   
+   // play the indicated card for the specified player
+   public Card playCard(int playerIndex, int cardIndex) 
    {
       // returns bad card if either argument is bad
       if (playerIndex < 0 || playerIndex > numPlayers - 1 || cardIndex < 0 || cardIndex > numCardsPerHand - 1) 
@@ -340,7 +189,8 @@ class CardGameFramework
 
    }
 
-   boolean takeCard(int playerIndex) 
+   // give a card from the deck to the specified player
+   public boolean takeCard(int playerIndex) 
    {
       // returns false if either argument is bad
       if (playerIndex < 0 || playerIndex > numPlayers - 1)
@@ -351,6 +201,121 @@ class CardGameFramework
          return false;
 
       return hand[playerIndex].takeCard(deck.dealCard());
+   }
+
+   /**
+    * Determines the winner of the round and returns an int specifying who won
+    * @param compCard
+    * @param humanCard
+    * @return 0 if computer won
+    * @return 1 if human won
+    * @return -1 if its a tie
+    */
+   public int determineRoundWinner(Card compCard, Card humanCard)
+   {
+
+      // Check who won this round 
+      if(Card.valueAsInt(compCard) < Card.valueAsInt(humanCard))
+      {
+         // Computer won this round
+         compWinnings[computerWinningsCounter] = compCard;
+         compWinnings[computerWinningsCounter + 1] = humanCard;
+         computerWinningsCounter += 2;
+         return 0;
+      }
+      else if(Card.valueAsInt(compCard) > Card.valueAsInt(humanCard))
+      {
+         // Human won this round
+         humanWinnings[humanWinningsCounter] = compCard;
+         humanWinnings[humanWinningsCounter + 1] = humanCard;
+         humanWinningsCounter += 2;
+         return 1;
+      }   
+      else
+      {
+         // There was a tie
+         return -1;
+      }
+   }
+
+   /**
+    * Checks if the game is over by checking if the player's hand is empty
+    * @param playerIndex
+    * @return boolean
+    */
+   public boolean isGameOver(int playerIndex)
+   {
+      if(getHand(playerIndex).getNumCards() == 0)
+      {
+         return true;
+      }
+      return false;
+   }
+
+   /**
+    * Retrieves the specified player's total score
+    * @param playerIndex
+    * @return the player's score
+    */
+   public int getPlayerScore(int playerIndex)
+   {
+      // Check who won 
+      if(playerIndex == 0)
+         return computerWinningsCounter; 
+
+      else if(playerIndex == 1)
+         return humanWinningsCounter;
+
+      else
+         return -1; // If input is incorrect
+   }
+   
+   public void sortHands() {
+      int k;
+
+      for (k = 0; k < numPlayers; k++)
+         hand[k].sort();
+   }
+   
+   // Sorts the specified player's hand
+   public void sortHand(int playerIndex)
+   {
+      getHand(playerIndex).sort();
+   }
+
+   // Retrieves the Icon for the specified Card
+   public Icon getCardIcon(Card card)
+   {
+      return GUICard.getIcon(card);
+
+   }
+   
+   // Returns the number of cards in a players hand
+   public int getNumCardsInHand(int playerIndex)
+   {
+      return getHand(playerIndex).getNumCards();
+   }
+   
+
+   public Hand getHand(int k) 
+   {
+      // hands start from 0 like arrays
+
+      // on error return automatic empty hand
+      if (k < 0 || k >= numPlayers)
+         return new Hand();
+
+      return hand[k];
+   }
+
+   public Card getCardFromDeck() 
+   {
+      return deck.dealCard();
+   }
+
+   public int getNumCardsRemainingInDeck() 
+   {
+      return deck.getNumCards();
    }
 
    int getNumCardsPerHand()
@@ -364,10 +329,10 @@ class CardGameFramework
    }
 
 }
-/*-----------------------------------------------------
- * End Of CardGameFramework
- *-----------------------------------------------/
 
+/*-----------------------------------------------------
+ * End Of GameModel class
+ *-----------------------------------------------/
 
 
  /****************************************************************
@@ -648,7 +613,7 @@ class Card
 class Hand 
 {
    // a hand can only have 52 cards maximum
-   public static final int MAX_CARDS = CardTable.MAX_CARDS_PER_HAND;
+   public static final int MAX_CARDS = 52;
 
    private Card[] myCards;
    private int numCards;
@@ -1013,7 +978,7 @@ class Deck
       {
          return false; // no room for the card
       }
-      
+
       int ctr = 0; // counter for the instances of the card
       for (int i = 0; i < topCard; i++)
       {
