@@ -63,7 +63,7 @@ public class GameView
       myCardTable.pnlHumanHand.setBackground(backgroundColor);
       myCardTable.pnlComputerHand.setBackground(backgroundColor);
       myCardTable.pnlTimerArea.setBackground(backgroundColor);
-
+      
       // show everything to the user
       myCardTable.setVisible(true);
 

@@ -4,6 +4,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import java.awt.Font;
 
 
 /****************************************************************
@@ -134,7 +135,7 @@ public class GameController implements ActionListener
        {
           timerButton.addActionListener(this);
           this.setHorizontalAlignment(SwingConstants.CENTER);
-          setText("00:00");
+          setFont(new Font("Adobe Caslon", Font.BOLD, 25));
        }
  
        /**
@@ -286,4 +287,4 @@ public class GameController implements ActionListener
        }
     }
  
-}
+} 
