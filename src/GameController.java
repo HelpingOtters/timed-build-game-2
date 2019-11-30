@@ -125,7 +125,7 @@ public class GameController implements ActionListener
     public static class Timer extends JLabel implements ActionListener
     {
        private JButton timerButton = new JButton();
-       private Counter counterThread = new Counter();
+       private Counter threadCount = new Counter();
  
        /**
         * default constructor
@@ -145,7 +145,7 @@ public class GameController implements ActionListener
           this(); // call to the default constructor
           if (startTimerNow)
           {
-             counterThread.start();
+             threadCount.start();
           }
        }
  
@@ -163,7 +163,7 @@ public class GameController implements ActionListener
         */
        public boolean resetTimer()
        {
-          this.counterThread.resetSec(0);
+          this.threadCount.resetSec(0);
           return true;
        }
  
@@ -173,13 +173,13 @@ public class GameController implements ActionListener
        @Override
        public void actionPerformed(ActionEvent e)
        {
-          if (counterThread.isAlive())
+          if (threadCount.isAlive())
           {
-             counterThread.stopThread();
-             counterThread = new Counter(counterThread.secElapsed());
+             threadCount.stopThread();
+             threadCount = new Counter(threadCount.secElapsed());
           } else
           {
-             counterThread.start();
+             threadCount.start();
           }
        }
  
