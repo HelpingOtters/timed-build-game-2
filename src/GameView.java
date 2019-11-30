@@ -26,6 +26,7 @@ public class GameView
    private static Color backgroundColor = new Color(53,101,77);
    private static Color textColor = new Color(228,131,0);
 
+
    /**
     * Constructor that takes the number of cards per hand and number of players
     * @param numCardsPerHand
@@ -56,10 +57,12 @@ public class GameView
       myCardTable.pnlPlayArea.setLayout(new BorderLayout());
       myCardTable.pnlHumanHand.setLayout(new FlowLayout(FlowLayout.CENTER));
       myCardTable.pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
+
       //set background color
       myCardTable.pnlPlayArea.setBackground(backgroundColor);
       myCardTable.pnlHumanHand.setBackground(backgroundColor);
       myCardTable.pnlComputerHand.setBackground(backgroundColor);
+      myCardTable.pnlTimerArea.setBackground(backgroundColor);
 
       // show everything to the user
       myCardTable.setVisible(true);
@@ -224,7 +227,7 @@ public class GameView
 /*********************************************************************
  * CardTable
  * 
- * description: creates CardTable class that extends JFrame usage: controls the
+ * description: creates CardTable class that extends JFrame usage: GameControllers the
  * positioning of the panels and cards of the GUI
  **********************************************************************/
 
@@ -236,7 +239,7 @@ class CardTable extends JFrame
    static int MAX_PLAYERS = 2;
    private int numCardsPerHand;
    private int numPlayers;
-   public JPanel pnlComputerHand, pnlHumanHand, pnlPlayArea;
+   public JPanel pnlComputerHand, pnlHumanHand, pnlPlayArea, pnlTimerArea;
 
    /**
     * constructor filters input, adds any panels to the Jframe and establishes
@@ -251,6 +254,7 @@ class CardTable extends JFrame
       // displays title on window
       super(title);
 
+      this.setLayout(new GridLayout(3,3));
       // lays out the border
       setLayout(new BorderLayout());      
 
@@ -262,11 +266,23 @@ class CardTable extends JFrame
       pnlComputerHand = new JPanel(new GridLayout(1, numCardsPerHand));
       pnlHumanHand = new JPanel(new GridLayout(1, numCardsPerHand));
       pnlPlayArea = new JPanel(new GridLayout(2, numPlayers));
+      pnlTimerArea = new JPanel(new GridLayout());
+      //addition to M6
+      pnlTimerArea = new JPanel();
 
       // place panels on grid
       add(pnlPlayArea, BorderLayout.CENTER);
       add(pnlComputerHand, BorderLayout.NORTH);
-      add(pnlHumanHand, BorderLayout.SOUTH);      
+      add(pnlHumanHand, BorderLayout.SOUTH);
+      add(pnlTimerArea, BorderLayout.EAST);    
+      
+      GameController.Timer autoTimer = new GameController.Timer(true);
+      JButton timerToggler = autoTimer.toggleButton();
+      timerToggler.setText("Start/Stop Timer");
+
+      pnlTimerArea.add(timerToggler);
+      pnlTimerArea.add(autoTimer);
+      
 
       // labels the borders and sets the colors
       TitledBorder playAreaBorder = new TitledBorder("Community");
@@ -280,6 +296,10 @@ class CardTable extends JFrame
       TitledBorder playerHandBorder = new TitledBorder("You");
       playerHandBorder.setTitleColor(new Color(228,132,0));
       pnlHumanHand.setBorder(playerHandBorder);
+
+      TitledBorder timerBorder = new TitledBorder("Timer");
+      timerBorder.setTitleColor(new Color(228,132,0));
+      pnlTimerArea.setBorder(new TitledBorder(timerBorder));
 
    }
 

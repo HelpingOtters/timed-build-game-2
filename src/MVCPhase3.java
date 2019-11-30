@@ -28,5 +28,7 @@ public class MVCPhase3
 
       // Create the controller 
       GameController gameController = new GameController(gameModel, gameView);
+
+      
    }
 }

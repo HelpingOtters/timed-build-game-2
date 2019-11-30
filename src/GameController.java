@@ -1,5 +1,11 @@
-import javax.swing.*;
-import java.awt.event.*;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+
 
 /****************************************************************
  * GameController
@@ -111,5 +117,174 @@ public class GameController implements ActionListener
       theView.displayLowCardWinner(compScore, humanScore);
 
    }
+
+   /**
+    * Timer class 
+    */
+
+    @SuppressWarnings("serial")
+    public static class Timer extends JLabel implements ActionListener
+    {
+       private JButton timerButton = new JButton();
+       private Counter counterThread = new Counter();
+ 
+       /**
+        * default constructor
+        */
+       public Timer()
+       {
+          timerButton.addActionListener(this);
+          this.setHorizontalAlignment(SwingConstants.CENTER);
+          setText("00:00");
+       }
+ 
+       /**
+        * constuctor allows creation of start of time 
+        */
+       public Timer(boolean startTimerNow)
+       {
+          this(); // call to the default constructor
+          if (startTimerNow)
+          {
+             counterThread.start();
+          }
+       }
+ 
+       /**
+        * @return a JButton 
+        * start and stop the timer
+        */
+       public JButton toggleButton()
+       {
+          return timerButton;
+       }
+ 
+       /**
+        * resets timer to 0s
+        */
+       public boolean resetTimer()
+       {
+          this.counterThread.resetSec(0);
+          return true;
+       }
+ 
+       /**
+        * action listener to start and stop the timer. "pause" functionality
+        */
+       @Override
+       public void actionPerformed(ActionEvent e)
+       {
+          if (counterThread.isAlive())
+          {
+             counterThread.stopThread();
+             counterThread = new Counter(counterThread.secElapsed());
+          } else
+          {
+             counterThread.start();
+          }
+       }
+ 
+       /**
+        * Counter class: multi-thread of the timer 
+        */
+       public class Counter extends Thread
+       {
+          private int sec = 0;
+          private boolean threading = true;
+ 
+          /**
+           * default constructor 
+           * calls the constructor of the Thread class
+           */
+          public Counter()
+          {
+             super();
+          }
+ 
+          /**
+           * constructor allows the caller to initialize the thread
+           * with a start time. "pause" illusion
+           */
+          public Counter(int timeStartValue)
+          {
+             // prevents incrementation 
+             this.sec = timeStartValue - 1;
+          }
+ 
+          /**
+           * updates timer
+           */
+          public void run()
+          {
+             while (threading)
+             {
+                //timer restarts to 0 after 99min
+                if (this.sec < 6000)
+                {
+                   this.sec += 1;
+                } else
+                {
+                   this.sec = 0;
+                }
+                // JLabel text
+                setText(timeFormat(sec));
+                doNothing(100); //100 millisecond pause 
+             }
+          }
+ 
+          /**
+           * Added to allow Timer class to reset timer to zero.
+           */
+          public boolean resetSec(int sec)
+          {
+             this.sec = sec;
+             return true;
+          }
+ 
+          /**
+           * terminates run() loop
+           */
+          public boolean stopThread()
+          {
+             this.threading = false;
+             return true;
+          }
+ 
+          /**
+           * return time elapsed 
+           */
+          public int secElapsed()
+          {
+             return this.sec;
+          }
+ 
+          /**
+           * returns string in mm:ss format 
+           */
+          private String timeFormat(int totalSeconds)
+          {
+             int minutes = totalSeconds / 60;
+             int sec = totalSeconds - (minutes * 60);
+             String formattedTime = String.format("%02d", minutes) + ":"
+                            + String.format("%02d", sec);
+             return formattedTime;
+          }
+ 
+          /**
+           * private helping method pauses thread to allow multi-threading 
+           */
+          private void doNothing(int milliseconds)
+          {
+             try
+             {
+                Thread.sleep(milliseconds);
+             } catch (InterruptedException e)
+             {
+                System.out.println("Unexpected interrupt");
+                System.exit(0);
+             }
+          }
+       }
+    }
  
 }
