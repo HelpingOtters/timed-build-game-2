@@ -1,57 +1,58 @@
 import javax.swing.*;
+
+import java.awt.Component;
 import java.awt.event.*;
 
 /****************************************************************
  * GameController
  * 
- * Description:  Manages both the GameModel and GameView objects   
- * Usage:        Communicates between the view and model classes
+ * Description: Manages both the GameModel and GameView objects Usage:
+ * Communicates between the view and model classes
  *****************************************************************/
 
-public class BuildController implements ActionListener
-{
+public class BuildController implements ActionListener {
    private BuildModel theModel;
    private BuildView theView;
 
    private int HUMAN = 1;
    private int COMPUTER = 0;
-   
+
    private boolean humanPlayed = false; // human starts first
-   private boolean compPlayed = true;  
+   private boolean compPlayed = true;
    private boolean humanTurn = true;
    private int humanCardIndex = -1;
-   
+
    /**
     * Constructor that starts a new game using a model and a view
+    * 
     * @param model
     * @param view
     */
-   public BuildController(BuildModel model, BuildView view)
-   {
+   public BuildController(BuildModel model, BuildView view) {
       theModel = model;
       theView = view;
 
       theModel.startNewGame();
       theView.createTable();
-     
+
       theView.createComputerStatus();
       theView.createHumanButton(this);
-      
+
+      loadDeck();
+
       loadPlayerHands();
       loadStack();
       loadScore();
    }
-   
-   public void loadScore()
-   {
+
+   public void loadScore() {
       theView.createScoreLabels(theModel.getPlayerScore(0), theModel.getPlayerScore(1));
    }
-   
+
    /**
     * Loads the computer and human's current hands onto the table
     */
-   public void loadPlayerHands()
-   {
+   public void loadPlayerHands() {
       // Get info from the GameModel class
       Icon[] playerIcons = theModel.loadHandIcons(HUMAN);
       Icon compIcon = theModel.getBackCardIcon();
@@ -61,26 +62,32 @@ public class BuildController implements ActionListener
       theView.createCompLabels(compIcon, numCompCards);
       theView.createHumanLabels(playerIcons, this);
    }
-   
+
    /**
     * Loads the specific hand onto the table
     */
-   public void loadPlayerHands(int handIndex)
-   {
+   public void loadPlayerHands(int handIndex) {
       // Get info from the GameModel class
       Icon[] playerIcons = theModel.loadHandIcons(handIndex);
-      
+
       // Display info with the GameView class
       theView.createHumanLabels(playerIcons, this);
    }
 
-   public void loadStack()
-   {
+   public void loadStack() {
       // Get info from the GameModel class
       Icon[] stackIcons = theModel.loadStackIcons();
-      
+
       // Display info with the GameView class
       theView.createStackButton(stackIcons, this);
+   }
+
+   public void loadDeck() 
+   {
+      for(int cards = 0; cards < 10; cards++)
+      {
+         theView.createDeckLabels(theModel.getBackCardIcon()); 
+      }
    }
    
    /**

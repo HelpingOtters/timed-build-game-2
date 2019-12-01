@@ -30,6 +30,7 @@ public class BuildView
    private JPanel humanPanel;
    private JPanel computerPanel;
    private JPanel scorePanel;
+   private JPanel theDeckPanel;
    
    private JLabel[] computerLabels;
    private JButton[] stackButtons; 
@@ -78,23 +79,28 @@ public class BuildView
       pnlPlayArea.setLayout(new BorderLayout());
       pnlHumanHand.setLayout(new FlowLayout(FlowLayout.CENTER));
       pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
-      
+
+      // define panels for the play area
+      //stackPanel = new JPanel(new GridLayout());
+      stackPanel = new JPanel(new FlowLayout());
+      humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      scorePanel = new JPanel(new GridLayout(2, 1));
+      theDeckPanel = new JPanel(new CardLayout());
+
       //set background color
       pnlPlayArea.setBackground(backgroundColor);
       pnlHumanHand.setBackground(backgroundColor);
       pnlComputerHand.setBackground(backgroundColor);
-
-      // define panels for the play area
-      stackPanel = new JPanel(new GridLayout());
-      humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-      computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-      scorePanel = new JPanel(new GridLayout(2, 1));
+      stackPanel.setBackground(backgroundColor);
+      theDeckPanel.setBackground(backgroundColor);
       
       // place panels on the play area
       pnlPlayArea.add(stackPanel, BorderLayout.CENTER);
       pnlPlayArea.add(computerPanel, BorderLayout.NORTH);
       pnlPlayArea.add(humanPanel, BorderLayout.SOUTH); 
       pnlPlayArea.add(scorePanel, BorderLayout.EAST);
+      pnlPlayArea.add(theDeckPanel, BorderLayout.WEST);
       
       // place panels on grid
       myCardTable.add(pnlPlayArea, BorderLayout.CENTER);
@@ -219,6 +225,16 @@ public class BuildView
       }
       myCardTable.setVisible(true);
       stackPanel.setVisible(true);
+   }
+
+   /**
+    * Creates the Deck Labels
+    */
+   public void createDeckLabels(Icon deckImage)
+   {
+      theDeckPanel.setVisible(false);
+      theDeckPanel.add(new JLabel(deckImage));
+      theDeckPanel.setVisible(true);
    }
    
    public void createScoreLabels(int compScore, int humScore)
