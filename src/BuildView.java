@@ -93,6 +93,8 @@ public class BuildView
       pnlHumanHand.setBackground(backgroundColor);
       pnlComputerHand.setBackground(backgroundColor);
       stackPanel.setBackground(backgroundColor);
+      computerPanel.setBackground(backgroundColor);
+      humanPanel.setBackground(backgroundColor);
       theDeckPanel.setBackground(backgroundColor);
       
       // place panels on the play area
@@ -129,6 +131,7 @@ public class BuildView
    {
       computerPanel.setVisible(false);
       JLabel status = new JLabel("Computer Status", JLabel.CENTER);
+      status.setForeground(textColor);
       computerPanel.add(status);
       computerPanel.setVisible(true);
    }
@@ -241,13 +244,16 @@ public class BuildView
    {
       scorePanel.removeAll();
       scorePanel.setVisible(false);
+      scorePanel.setBackground(backgroundColor);
       
       String text = "   Computer Score: " + compScore + "     ";
       JLabel compLabel = new JLabel(text, JLabel.CENTER);
+      compLabel.setForeground(textColor);
       scorePanel.add(compLabel);
       
       String text1 = "Your Score: " + humScore;
       JLabel humLabel = new JLabel(text1, JLabel.CENTER);
+      humLabel.setForeground(textColor);
       scorePanel.add(humLabel);
       
       scorePanel.setVisible(true);
