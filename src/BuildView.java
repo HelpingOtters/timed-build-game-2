@@ -86,7 +86,7 @@ public class BuildView
       stackPanel = new JPanel(new FlowLayout());
       humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-      scorePanel = new JPanel(new GridLayout(2, 1));
+      scorePanel = new JPanel(new GridLayout(4, 1));
       theDeckPanel = new JPanel(new CardLayout());
 
       //set background color
@@ -112,15 +112,15 @@ public class BuildView
 
       // labels the borders and sets the colors
       TitledBorder playAreaBorder = new TitledBorder("Community");
-      playAreaBorder.setTitleColor(new Color(228,132,0));
+      playAreaBorder.setTitleColor(textColor);
       pnlPlayArea.setBorder(playAreaBorder);
 
       TitledBorder compHandBorder = new TitledBorder("Computer");
-      compHandBorder.setTitleColor(new Color(228,132,0));
+      compHandBorder.setTitleColor(textColor);
       pnlComputerHand.setBorder(compHandBorder);
 
       TitledBorder playerHandBorder = new TitledBorder("You");
-      playerHandBorder.setTitleColor(new Color(228,132,0));
+      playerHandBorder.setTitleColor(textColor);
       pnlHumanHand.setBorder(playerHandBorder);
 
       
@@ -247,6 +247,13 @@ public class BuildView
       scorePanel.removeAll();
       scorePanel.setVisible(false);
       scorePanel.setBackground(backgroundColor);
+
+      BuildController.Timer autoTimer = new BuildController.Timer(true);
+      JButton timerToggler = autoTimer.toggleButton();
+      timerToggler.setText("Start/Stop Timer");
+
+      scorePanel.add(timerToggler);
+      scorePanel.add(autoTimer);
       
       String text = "   Computer Score: " + compScore + "     ";
       JLabel compLabel = new JLabel(text, JLabel.CENTER);
