@@ -2,32 +2,35 @@ import java.util.Random;
 import javax.swing.*;
 
 /****************************************************************
- * GameModel
+ * BuildModel
  * 
- * Description:  Creates the model for a card game  
+ * Description:  Creates the model for a game called "BUILD"
  * Usage:        Manages the data of the card game
  *****************************************************************/
 
-public class GameModel
+public class BuildModel
 {
    private static final int MAX_PLAYERS = 50;
+   private static final int NUM_STACKS = 3; // only 3 stacks for the game
    
    private int numPlayers;
    private int numPacks; // # standard 52-card packs per deck
-   // ignoring jokers or unused cards
+   
    private int numJokersPerPack; // if 2 per pack & 3 packs per deck, get 6
    private int numUnusedCardsPerPack; // # cards removed from each pack
    private int numCardsPerHand; // # cards to deal each player
+   private Card[] unusedCardsPerPack; // an array holding the cards not used
+   
    private Deck deck; // holds the initial full deck and gets
+   
    // smaller (usually) during play
    private Hand[] hand; // one Hand for each player
-   private Card[] unusedCardsPerPack; // an array holding the cards not used
-
+   public Card[] stack =  new Card[NUM_STACKS];  
+   
    // Variables to keep track of winnings
-   private int computerWinningsCounter = 0;
-   private int humanWinningsCounter = 0;
-   private Card[] compWinnings;
-   private Card[] humanWinnings;
+   private int computerScore= 0;
+   private int humanScore = 0;
+   private boolean deckExhausted = false;
    
 
    /** 
@@ -39,7 +42,7 @@ public class GameModel
     * @param numPlayers
     * @param numCardsPerHand
     */
-   public GameModel(int numPacks, int numJokersPerPack, 
+   public BuildModel(int numPacks, int numJokersPerPack, 
       int numUnusedCardsPerPack, Card[] unusedCardsPerPack,
       int numPlayers, int numCardsPerHand) 
    {
@@ -77,24 +80,23 @@ public class GameModel
       // prepare deck and shuffle
       initGame();
 
-      compWinnings = new Card[getNumCardsRemainingInDeck() * numPlayers];
-      humanWinnings = new Card[getNumCardsRemainingInDeck() * numPlayers];
    }
    
    // constructor overload/default for game like bridge
-   public GameModel() 
+   public BuildModel() 
    {
-      this(1, 0, 0, null, 4, 13);
+      this(1, 0, 0, null, 2, 7);
    }
 
    /** 
-    * Loads all the card icons to be used later and deals the deck
+    * Loads all the card icons to be used later and deals cards to each hand and the stacks
     */
    public void startNewGame()
    {
       GUICard.loadCardIcons();
 
-      deal();
+      dealToHand();  // deal cards to hands
+      dealToStack(); // deal cards to the stacks
    }
    
    // create a new deck and the correct number of hands. Shuffle the deck.
@@ -123,7 +125,7 @@ public class GameModel
    }
 
    // deal the specified number of cards to each hand
-   public boolean deal() 
+   public boolean dealToHand() 
    {
       // returns false if not enough cards, but deals what it can
       int k, j;
@@ -147,6 +149,25 @@ public class GameModel
 
       return enoughCards;
    }
+   
+   // deal cards to each stack
+   public boolean dealToStack()
+   {
+      for(int i = 0; i < NUM_STACKS; i++)
+      {
+         if(deck.getNumCards() > 0)
+         {
+            stack[i] = deck.dealCard();
+         }
+         else
+         {
+            deckExhausted = true;
+            return false;
+         }
+             
+      }
+      return true;
+   }
 
    /**
     * Retrieves all the icons associated with the player's current hand
@@ -166,6 +187,18 @@ public class GameModel
       }
 
       return playerIcons;
+   }
+   
+   public Icon[] loadStackIcons()
+   {
+      Icon[] stackIcons = new Icon[NUM_STACKS];
+
+      for (int i = 0; i < NUM_STACKS; i++)
+      {
+         stackIcons[i] = GUICard.getIcon(stack[i]);
+      }
+
+      return stackIcons;
    }
 
    // Retrieves the back card icon
@@ -198,60 +231,37 @@ public class GameModel
 
       // Are there enough Cards?
       if (deck.getNumCards() <= 0)
+      {
+         deckExhausted = true;
          return false;
+      }
 
       return hand[playerIndex].takeCard(deck.dealCard());
    }
-
-   /**
-    * Determines the winner of the round and returns an int specifying who won
-    * @param compCard
-    * @param humanCard
-    * @return 0 if computer won
-    * @return 1 if human won
-    * @return -1 if its a tie
-    */
-   public int determineRoundWinner(Card compCard, Card humanCard)
-   {
-
-      // Check who won this round 
-      if(Card.valueAsInt(compCard) < Card.valueAsInt(humanCard))
-      {
-         // Computer won this round
-         compWinnings[computerWinningsCounter] = compCard;
-         compWinnings[computerWinningsCounter + 1] = humanCard;
-         computerWinningsCounter += 2;
-         return 0;
-      }
-      else if(Card.valueAsInt(compCard) > Card.valueAsInt(humanCard))
-      {
-         // Human won this round
-         humanWinnings[humanWinningsCounter] = compCard;
-         humanWinnings[humanWinningsCounter + 1] = humanCard;
-         humanWinningsCounter += 2;
-         return 1;
-      }   
-      else
-      {
-         // There was a tie
-         return -1;
-      }
-   }
-
    /**
     * Checks if the game is over by checking if the player's hand is empty
     * @param playerIndex
     * @return boolean
     */
-   public boolean isGameOver(int playerIndex)
+   public boolean isGameOver()
    {
-      if(getHand(playerIndex).getNumCards() == 0)
+      if(deckExhausted)
       {
          return true;
       }
       return false;
    }
+   
+   public void addScore(int playerIndex)
+   {
+      if(playerIndex == 0)
+         computerScore++; 
 
+      else if(playerIndex == 1)
+         humanScore++;
+      
+   }
+   
    /**
     * Retrieves the specified player's total score
     * @param playerIndex
@@ -261,16 +271,17 @@ public class GameModel
    {
       // Check who won 
       if(playerIndex == 0)
-         return computerWinningsCounter; 
+         return computerScore; 
 
       else if(playerIndex == 1)
-         return humanWinningsCounter;
+         return humanScore;
 
       else
          return -1; // If input is incorrect
    }
    
-   public void sortHands() {
+   public void sortHands() 
+   {
       int k;
 
       for (k = 0; k < numPlayers; k++)
@@ -310,6 +321,11 @@ public class GameModel
 
    public Card getCardFromDeck() 
    {
+      if(deck.getNumCards() == 0)
+      {
+         deckExhausted = true;
+      }
+      
       return deck.dealCard();
    }
 
@@ -318,14 +334,30 @@ public class GameModel
       return deck.getNumCards();
    }
 
-   int getNumCardsPerHand()
+   public int getNumCardsPerHand()
    {
       return numCardsPerHand;
    }
 
-   int getNumPlayers()
+   public int getNumPlayers()
    {
       return numPlayers;
+   }
+   
+   public Card[] getStack()
+   {
+      return stack;
+   }
+   
+   // set the stack at stackIndex with the given card
+   public boolean setStackCard(int stackIndex, Card card)
+   {
+      if (stackIndex < NUM_STACKS && stackIndex >= 0)
+      {
+         stack[stackIndex] = card;
+         return true;
+      }
+      return false;
    }
 
 }

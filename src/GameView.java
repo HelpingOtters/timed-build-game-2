@@ -17,11 +17,14 @@ public class GameView
    private int numCardsPerHand;
    private int numPlayers;
    
+   private static JPanel pnlComputerHand;
+   private static JPanel pnlHumanHand;
+   private static JPanel pnlPlayArea;
    private static JPanel cardsPanel = new JPanel(new GridLayout());
    private static JLabel[] computerLabels;
    private static JLabel[] playedCardLabels; 
    private static JButton[] cardButtons;
-   private static CardTable myCardTable;
+   private static JFrame myCardTable;
 
    private static Color backgroundColor = new Color(53,101,77);
    private static Color textColor = new Color(228,131,0);
@@ -47,22 +50,46 @@ public class GameView
       playedCardLabels  = new JLabel[numPlayers]; 
       cardButtons = new JButton[numCardsPerHand];
 
-      // establish main frame in which program will run
-      myCardTable 
-      = new CardTable("Card Table", numCardsPerHand, numPlayers);
+      // Establish main frame in which program will run
+      myCardTable = new JFrame("Card Table");
+
+      // Update the frame's display
+      myCardTable.setLayout(new BorderLayout());  
       myCardTable.setSize(800, 600);
       myCardTable.setLocationRelativeTo(null);
       myCardTable.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      // Set up the play area layout
-      myCardTable.pnlPlayArea.setLayout(new BorderLayout());
-      myCardTable.pnlHumanHand.setLayout(new FlowLayout(FlowLayout.CENTER));
-      myCardTable.pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
 
+      // field panels defined
+      pnlComputerHand = new JPanel(new GridLayout(1, numCardsPerHand));
+      pnlHumanHand = new JPanel(new GridLayout(1, numCardsPerHand));
+      pnlPlayArea = new JPanel(new GridLayout(2, numPlayers));
+      
+      // Set up the play area layout
+      pnlPlayArea.setLayout(new BorderLayout());
+      pnlHumanHand.setLayout(new FlowLayout(FlowLayout.CENTER));
+      pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
       //set background color
-      myCardTable.pnlPlayArea.setBackground(backgroundColor);
-      myCardTable.pnlHumanHand.setBackground(backgroundColor);
-      myCardTable.pnlComputerHand.setBackground(backgroundColor);
-      myCardTable.pnlTimerArea.setBackground(backgroundColor);
+      pnlPlayArea.setBackground(backgroundColor);
+      pnlHumanHand.setBackground(backgroundColor);
+      pnlComputerHand.setBackground(backgroundColor);
+
+      // place panels on grid
+      myCardTable.add(pnlPlayArea, BorderLayout.CENTER);
+      myCardTable.add(pnlComputerHand, BorderLayout.NORTH);
+      myCardTable.add(pnlHumanHand, BorderLayout.SOUTH); 
+
+      // labels the borders and sets the colors
+      TitledBorder playAreaBorder = new TitledBorder("Community");
+      playAreaBorder.setTitleColor(new Color(228,132,0));
+      pnlPlayArea.setBorder(playAreaBorder);
+
+      TitledBorder compHandBorder = new TitledBorder("Computer");
+      compHandBorder.setTitleColor(new Color(228,132,0));
+      pnlComputerHand.setBorder(compHandBorder);
+
+      TitledBorder playerHandBorder = new TitledBorder("You");
+      playerHandBorder.setTitleColor(new Color(228,132,0));
+      pnlHumanHand.setBorder(playerHandBorder);
       
       // show everything to the user
       myCardTable.setVisible(true);
@@ -77,8 +104,8 @@ public class GameView
    public void createCompLabels(Icon icon, int numCompCards)
    {
       // Clear any old data 
-      myCardTable.pnlComputerHand.removeAll();
-      myCardTable.pnlComputerHand.setVisible(false);
+      pnlComputerHand.removeAll();
+      pnlComputerHand.setVisible(false);
 
       // Create the labels
       for (int card = 0; card < numCompCards; card++)
@@ -87,10 +114,10 @@ public class GameView
          computerLabels[card] = new JLabel(icon);
          
          // add computer's card labels to the table
-         myCardTable.pnlComputerHand.add(computerLabels[card]);
+         pnlComputerHand.add(computerLabels[card]);
       }
      myCardTable.setVisible(true);
-     myCardTable.pnlComputerHand.setVisible(true);
+     pnlComputerHand.setVisible(true);
    }
 
    /**
@@ -101,8 +128,8 @@ public class GameView
    public void createHumanLabels(Icon[] cardIcons, ActionListener buttonListener)
    {
       // Clear any old data 
-      myCardTable.pnlHumanHand.removeAll();
-      myCardTable.pnlHumanHand.setVisible(false);
+      pnlHumanHand.removeAll();
+      pnlHumanHand.setVisible(false);
       
       // Create the buttons for each card
       for (int index = 0; index < cardIcons.length; index++)
@@ -114,10 +141,10 @@ public class GameView
          cardButtons[index].addActionListener(buttonListener);
          
          // add human's card buttons to the table
-         myCardTable.pnlHumanHand.add(cardButtons[index]);
+         pnlHumanHand.add(cardButtons[index]);
       }
      myCardTable.setVisible(true);
-     myCardTable.pnlHumanHand.setVisible(true);
+     pnlHumanHand.setVisible(true);
    }
    
    /**
@@ -142,14 +169,14 @@ public class GameView
       playedCardLabels[COMP_INDEX].setVerticalTextPosition(JLabel.BOTTOM);
 
       // Remove old info from play area 
-      myCardTable.pnlPlayArea.removeAll();
+      pnlPlayArea.removeAll();
       cardsPanel.removeAll();
       
       // Add new cards to play area
       cardsPanel.add(playedCardLabels[HUMAN_INDEX]);
       cardsPanel.add(playedCardLabels[COMP_INDEX]);
       cardsPanel.setBackground(backgroundColor);
-      myCardTable.pnlPlayArea.add(cardsPanel, BorderLayout.NORTH);
+      pnlPlayArea.add(cardsPanel, BorderLayout.NORTH);
       
       myCardTable.setVisible(true);
    }
@@ -180,7 +207,7 @@ public class GameView
          winnerMessage.setForeground(textColor);
       }
 
-      myCardTable.pnlPlayArea.add(winnerMessage, BorderLayout.CENTER);
+      pnlPlayArea.add(winnerMessage, BorderLayout.CENTER);
       myCardTable.setVisible(true);
       
    }
@@ -199,26 +226,30 @@ public class GameView
       //computer wins scenario
       if(compScore > humanScore)
       {
-         myCardTable.pnlPlayArea.removeAll();
+         pnlPlayArea.removeAll();
          cardsPanel.removeAll();
-         JOptionPane.showMessageDialog(null,new JLabel(compWinner,JLabel.CENTER),"01010111 01001001 01001110", JOptionPane.PLAIN_MESSAGE);  
+         JOptionPane.showMessageDialog(null,new JLabel(
+            compWinner,JLabel.CENTER),"01010111 01001001 01001110", 
+            JOptionPane.PLAIN_MESSAGE);  
          System.exit(0);       
       }
       //human wins scenario
       else if (humanScore > compScore)
       {
-         myCardTable.pnlPlayArea.removeAll();
+         pnlPlayArea.removeAll();
          cardsPanel.removeAll();
-         JOptionPane.showMessageDialog(null,new JLabel(humanWinner,JLabel.CENTER),"HUMANS RULE! ROBOTS DROOL!", JOptionPane.PLAIN_MESSAGE); 
+         JOptionPane.showMessageDialog(null,new JLabel(
+            humanWinner,JLabel.CENTER),"HUMANS RULE! ROBOTS DROOL!", 
+            JOptionPane.PLAIN_MESSAGE); 
          System.exit(0);       
       }
-      //tie scenario. If we are only playing cards in hand this should never happen
+      //tie scenario
       else
       {
-         //JOptionPane.showMessageDialog(null,new ImageIcon("gifs/TIE.gif"),"IT'S A TIE", JOptionPane.PLAIN_MESSAGE);
-         myCardTable.pnlPlayArea.removeAll();
+         pnlPlayArea.removeAll();
          cardsPanel.removeAll();
-         JOptionPane.showMessageDialog(null,new JLabel(tie,JLabel.CENTER),"IT'S A TIE", JOptionPane.PLAIN_MESSAGE);
+         JOptionPane.showMessageDialog(null,new JLabel(
+            tie,JLabel.CENTER),"IT'S A TIE", JOptionPane.PLAIN_MESSAGE);
          System.exit(0); 
       }
    }

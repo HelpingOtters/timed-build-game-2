@@ -2,6 +2,13 @@
    "configurations": [
       {
          "type": "java",
+         "name": "CodeLens (Launch) - MVCBuild",
+         "request": "launch",
+         "mainClass": "MVCBuild",
+         "projectName": "timed-build-game"
+      },
+      {
+         "type": "java",
          "name": "CodeLens (Launch) - MVCPhase3",
          "request": "launch",
          "mainClass": "MVCPhase3",
