@@ -240,6 +240,7 @@ public class BuildController implements ActionListener
    {
       if(humanCardIndex >= 0)
       {
+         // card is selected to place on the stack
          Card[] stack = theModel.getStack();
          Hand hand = theModel.getHand(HUMAN);
          Card stackCard = stack[stackIndex];
@@ -271,6 +272,7 @@ public class BuildController implements ActionListener
                theView.createHumanLabels(playerIcons, this);
 
                // human turn is done
+               humanCardIndex = -1; // clear the selected card
                humanPlayed = true;
                humanTurn = false;
             }
