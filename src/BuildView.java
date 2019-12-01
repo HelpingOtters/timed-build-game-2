@@ -74,6 +74,7 @@ public class BuildView
       pnlComputerHand = new JPanel();
       pnlHumanHand = new JPanel();
       pnlPlayArea = new JPanel();
+   
       
       // Set up layout for panels
       pnlPlayArea.setLayout(new BorderLayout());
@@ -121,6 +122,7 @@ public class BuildView
       TitledBorder playerHandBorder = new TitledBorder("You");
       playerHandBorder.setTitleColor(new Color(228,132,0));
       pnlHumanHand.setBorder(playerHandBorder);
+
       
       // show everything to the user
       myCardTable.setVisible(true);
@@ -317,4 +319,95 @@ public class BuildView
       }
    }
    
+}
+
+/*********************************************************************
+ * CardTable
+ * 
+ * description: creates CardTable class that extends JFrame usage: BuildControllers the
+ * positioning of the panels and cards of the GUI
+ **********************************************************************/
+
+class CardTable extends JFrame 
+{
+   private static final long serialVersionUID = 1L;
+   // members establish the grid layout for the JPanels
+   static int MAX_CARDS_PER_HAND = 56;
+   static int MAX_PLAYERS = 2;
+   private int numCardsPerHand;
+   private int numPlayers;
+   public JPanel pnlComputerHand, pnlHumanHand, pnlPlayArea, pnlTimerArea;
+
+   /**
+    * constructor filters input, adds any panels to the Jframe and establishes
+    * layouts accordingly.
+    * 
+    * @param title
+    * @param numCardsPerHand
+    * @param numPlayers
+    */
+   public CardTable(String title, int numCardsPerHand, int numPlayers) 
+   {
+      // displays title on window
+      super(title);
+
+      this.setLayout(new GridLayout(3,3));
+      // lays out the border
+      setLayout(new BorderLayout());      
+
+      // values that will be used
+      this.numCardsPerHand = numCardsPerHand;
+      this.numPlayers = numPlayers;
+
+      // field panels defined
+      pnlComputerHand = new JPanel(new GridLayout(1, numCardsPerHand));
+      pnlHumanHand = new JPanel(new GridLayout(1, numCardsPerHand));
+      pnlPlayArea = new JPanel(new GridLayout(2, numPlayers));
+      pnlTimerArea = new JPanel(new GridLayout());
+      //addition to M6
+      pnlTimerArea = new JPanel();
+
+      // place panels on grid
+      add(pnlPlayArea, BorderLayout.CENTER);
+      add(pnlComputerHand, BorderLayout.NORTH);
+      add(pnlHumanHand, BorderLayout.SOUTH);
+      add(pnlTimerArea, BorderLayout.EAST);    
+      
+      BuildController.Timer autoTimer = new BuildController.Timer(true);
+      JButton timerToggler = autoTimer.toggleButton();
+      timerToggler.setText("Start/Stop Timer");
+
+      pnlTimerArea.add(timerToggler);
+      pnlTimerArea.add(autoTimer);
+      
+
+      // labels the borders and sets the colors
+      TitledBorder playAreaBorder = new TitledBorder("Community");
+      playAreaBorder.setTitleColor(new Color(228,132,0));
+      pnlPlayArea.setBorder(playAreaBorder);
+
+      TitledBorder compHandBorder = new TitledBorder("Computer");
+      compHandBorder.setTitleColor(new Color(228,132,0));
+      pnlComputerHand.setBorder(compHandBorder);
+
+      TitledBorder playerHandBorder = new TitledBorder("You");
+      playerHandBorder.setTitleColor(new Color(228,132,0));
+      pnlHumanHand.setBorder(playerHandBorder);
+
+      TitledBorder timerBorder = new TitledBorder("Timer");
+      timerBorder.setTitleColor(new Color(228,132,0));
+      pnlTimerArea.setBorder(new TitledBorder(timerBorder));
+
+   }
+
+   // accessors
+   public int getNumCardsPerHand() 
+   {
+      return numCardsPerHand;
+   }
+
+   public int getNumPlayers() 
+   {
+      return numPlayers;
+   }
 }
