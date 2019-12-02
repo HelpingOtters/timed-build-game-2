@@ -92,6 +92,9 @@ public class BuildView
       computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       scorePanel = new JPanel(new GridLayout(3, 1));
       theDeckPanel = new JPanel(new CardLayout());
+      
+    
+      
 
       //forces the sizes to keep the panels even
       theDeckPanel.setPreferredSize(new Dimension(135,200));
@@ -104,7 +107,9 @@ public class BuildView
       scorePanel.setBorder(new LineBorder(Color.BLACK));
       theDeckPanel.setBorder(new LineBorder(Color.BLACK));
       System.out.println(theDeckPanel.getSize());
+
       */
+      theDeckPanel.setBorder(new LineBorder(Color.BLACK));
 
       //set background color
       pnlPlayArea.setBackground(pokerGreen);
@@ -269,12 +274,24 @@ public class BuildView
 
    /**
     * Creates the Deck Labels
+    *@param deckImage
     */
-   public void createDeckLabels(Icon deckImage)
+   public void createDeckLabels(Icon deckImage, int x)
    {
-      theDeckPanel.setVisible(false);
+      //JLabel test = new JLabel(deckImage);
+      //theDeckPanel.setVisible(false);
       theDeckPanel.add(new JLabel(deckImage));
+      //theDeckPanel.add(test);
+      //test.setBounds(x,65,deckImage.getIconWidth(),deckImage.getIconHeight());
       theDeckPanel.setVisible(true);
+   }
+   /**
+    * clears the deck panel
+    */
+   public void clearDeckLabels()
+   {
+      theDeckPanel.removeAll();
+      theDeckPanel.setVisible(false);
    }
    
    public void createScoreLabels(int compScore, int humScore)

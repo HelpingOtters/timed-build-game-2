@@ -65,6 +65,7 @@ public class BuildController implements ActionListener {
 
    /**
     * Loads the specific hand onto the table
+    *@param handIndex
     */
    public void loadPlayerHands(int handIndex) {
       // Get info from the GameModel class
@@ -82,13 +83,13 @@ public class BuildController implements ActionListener {
       theView.createStackButton(stackIcons, this);
    }
    /**
-    * Dan's Test
+    * Dan's Test creates a deck of 56 back of card icons
     */
    public void loadDeck() 
    {
-      for(int cards = 0; cards < 10; cards++)
+      for(int cards = 0, x = 56; cards < 56; cards++, x--)
       {
-         theView.createDeckLabels(theModel.getBackCardIcon()); 
+         theView.createDeckLabels(theModel.getBackCardIcon(),x); 
       }
    }
    
@@ -104,6 +105,7 @@ public class BuildController implements ActionListener {
       int cardIndex = Integer.parseInt(cardPlayed); 
       
       System.out.println("Action Command Index: " + cardIndex);
+      System.out.println("Cards in Deck : " + theModel.getNumCardsRemainingInDeck());
    
       if (cardIndex == BuildView.BUTTON_INDEX)
       {
@@ -304,7 +306,8 @@ public class BuildController implements ActionListener {
    {      
       int humanScore = theModel.getPlayerScore(HUMAN);
       int compScore = theModel.getPlayerScore(COMPUTER);
-      
+      //***********add a clear deck method here? - Dan ***********************************************/
+      theView.clearDeckLabels();
       theView.displayWinner(compScore, humanScore);
       
       System.exit(0);
