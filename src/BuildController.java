@@ -421,7 +421,7 @@ public class BuildController implements ActionListener {
                 }
                 // JLabel text
                 setText(timeFormat(sec));
-                doNothing(100); //100 millisecond pause 
+                doNothing(1000); //1000 millisecond pause 
              }
           }
  
