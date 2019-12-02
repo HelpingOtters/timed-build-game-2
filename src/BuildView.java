@@ -348,7 +348,7 @@ public class BuildView
       {
          // the low score wins
          JOptionPane.showMessageDialog(myCardTable,new JLabel(
-            compWinner,JLabel.CENTER),"Nice try, go again.", 
+            compWinner,JLabel.CENTER),"01010111 01001001 01001110", 
             JOptionPane.PLAIN_MESSAGE);  
          
      
