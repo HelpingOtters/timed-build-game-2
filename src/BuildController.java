@@ -46,7 +46,7 @@ public class BuildController implements ActionListener {
    }
 
    public void loadScore() {
-      theView.createScoreLabels(theModel.getPlayerScore(0), theModel.getPlayerScore(1));
+      theView.createScoreLabels(theModel.getPlayerScore(COMPUTER), theModel.getPlayerScore(HUMAN));
    }
 
    /**
@@ -81,7 +81,9 @@ public class BuildController implements ActionListener {
       // Display info with the GameView class
       theView.createStackButton(stackIcons, this);
    }
-
+   /**
+    * Dan's Test
+    */
    public void loadDeck() 
    {
       for(int cards = 0; cards < 10; cards++)
