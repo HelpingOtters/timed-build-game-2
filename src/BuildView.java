@@ -36,9 +36,13 @@ public class BuildView
    private JButton[] stackButtons; 
    private JButton[] cardButtons;
    private JFrame myCardTable;
-
-   private Color backgroundColor = new Color(53,101,77);
-   private Color textColor = new Color(228,131,0);
+   //Experimental by Dan
+   BuildController.Timer autoTimer = new BuildController.Timer(true);
+   private JButton timerButton = autoTimer.toggleButton();
+   //Theme colors
+   private Color pokerGreen = new Color(53,101,77);
+   private Color gold = new Color(228,131,0);
+   private Color ruby = new Color(88,7,37);
 
    /**
     * Constructor that takes the number of cards per hand and number of players
@@ -83,20 +87,33 @@ public class BuildView
 
       // define panels for the play area
       //stackPanel = new JPanel(new GridLayout());
-      stackPanel = new JPanel(new FlowLayout());
+      stackPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-      scorePanel = new JPanel(new GridLayout(4, 1));
+      scorePanel = new JPanel(new GridLayout(3, 1));
       theDeckPanel = new JPanel(new CardLayout());
 
+      //forces the sizes to keep the panels even
+      theDeckPanel.setPreferredSize(new Dimension(135,200));
+      scorePanel.setPreferredSize(new Dimension(135,200));
+      //theDeckPanel = new JPanel(new GridLayout(3,1));
+
+      //testing sizes
+      /*
+      stackPanel.setBorder(new LineBorder(Color.BLACK));
+      scorePanel.setBorder(new LineBorder(Color.BLACK));
+      theDeckPanel.setBorder(new LineBorder(Color.BLACK));
+      System.out.println(theDeckPanel.getSize());
+      */
+
       //set background color
-      pnlPlayArea.setBackground(backgroundColor);
-      pnlHumanHand.setBackground(backgroundColor);
-      pnlComputerHand.setBackground(backgroundColor);
-      stackPanel.setBackground(backgroundColor);
-      computerPanel.setBackground(backgroundColor);
-      humanPanel.setBackground(backgroundColor);
-      theDeckPanel.setBackground(backgroundColor);
+      pnlPlayArea.setBackground(pokerGreen);
+      pnlHumanHand.setBackground(pokerGreen);
+      pnlComputerHand.setBackground(pokerGreen);
+      stackPanel.setBackground(pokerGreen);
+      computerPanel.setBackground(pokerGreen);
+      humanPanel.setBackground(pokerGreen);
+      theDeckPanel.setBackground(pokerGreen);
       
       // place panels on the play area
       pnlPlayArea.add(stackPanel, BorderLayout.CENTER);
@@ -112,28 +129,36 @@ public class BuildView
 
       // labels the borders and sets the colors
       TitledBorder playAreaBorder = new TitledBorder("Community");
-      playAreaBorder.setTitleColor(textColor);
+      playAreaBorder.setTitleColor(gold);
       pnlPlayArea.setBorder(playAreaBorder);
 
       TitledBorder compHandBorder = new TitledBorder("Computer");
-      compHandBorder.setTitleColor(textColor);
+      compHandBorder.setTitleColor(gold);
       pnlComputerHand.setBorder(compHandBorder);
 
       TitledBorder playerHandBorder = new TitledBorder("You");
-      playerHandBorder.setTitleColor(textColor);
+      playerHandBorder.setTitleColor(gold);
       pnlHumanHand.setBorder(playerHandBorder);
 
-      
       // show everything to the user
       myCardTable.setVisible(true);
 
    }
 
+   /**
+    * 
+    *
+   public Boolean isAlive()
+   {
+      System.out.println(autoTimer);
+      return false;
+   }
+   */
    public void createComputerStatus()
    {
       computerPanel.setVisible(false);
       JLabel status = new JLabel("Computer Status", JLabel.CENTER);
-      status.setForeground(textColor);
+      status.setForeground(gold);
       computerPanel.add(status);
       computerPanel.setVisible(true);
    }
@@ -142,10 +167,19 @@ public class BuildView
    {
       humanPanel.setVisible(false);
       JButton button = new JButton("I can't play");
+      button.setPreferredSize(new Dimension(135,30));
+      button.setBackground(ruby);
+      button.setForeground(Color.WHITE);
       button.setActionCommand(Integer.toString(BUTTON_INDEX));
       button.addActionListener(buttonListener);
       humanPanel.add(button);
-      
+
+      timerButton.setText("Start/Stop Timer");
+      timerButton.setPreferredSize(new Dimension(135,30));
+      timerButton.setBackground(ruby);
+      timerButton.setForeground(Color.white);
+      humanPanel.add(timerButton);
+     
       humanPanel.setVisible(true);
    }
    
@@ -178,6 +212,7 @@ public class BuildView
       computerPanel.setVisible(false);
       computerPanel.removeAll();
       JLabel label = new JLabel(status, JLabel.CENTER);
+      label.setForeground(gold);
       computerPanel.add(label);
       computerPanel.setVisible(true);
    }
@@ -246,23 +281,31 @@ public class BuildView
    {
       scorePanel.removeAll();
       scorePanel.setVisible(false);
-      scorePanel.setBackground(backgroundColor);
-
+      scorePanel.setBackground(pokerGreen);
+      /*
       BuildController.Timer autoTimer = new BuildController.Timer(true);
       JButton timerToggler = autoTimer.toggleButton();
       timerToggler.setText("Start/Stop Timer");
 
+      autoTimer.setForeground(Color.WHITE);
+      timerToggler.setPreferredSize(new Dimension());
+      System.out.println("Button size: " + timerToggler.getSize());
+
       scorePanel.add(timerToggler);
       scorePanel.add(autoTimer);
-      
+      */
+      //autoTimer.setBorder(new LineBorder(Color.WHITE));
+      autoTimer.setForeground(Color.WHITE);
+      scorePanel.add(autoTimer);
+
       String text = "   Computer Score: " + compScore + "     ";
       JLabel compLabel = new JLabel(text, JLabel.CENTER);
-      compLabel.setForeground(textColor);
+      compLabel.setForeground(gold);
       scorePanel.add(compLabel);
       
       String text1 = "Your Score: " + humScore;
       JLabel humLabel = new JLabel(text1, JLabel.CENTER);
-      humLabel.setForeground(textColor);
+      humLabel.setForeground(gold);
       scorePanel.add(humLabel);
       
       scorePanel.setVisible(true);
@@ -273,6 +316,7 @@ public class BuildView
    {
       stackPanel.setVisible(false);
       stackButtons[stackIndex].setIcon(stackIcon);
+      //stackPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
       stackPanel.setVisible(true);
    }
    
@@ -304,15 +348,16 @@ public class BuildView
       {
          // the low score wins
          JOptionPane.showMessageDialog(myCardTable,new JLabel(
-            compWinner,JLabel.CENTER),"", 
+            compWinner,JLabel.CENTER),"Nice try, go again.", 
             JOptionPane.PLAIN_MESSAGE);  
+         
      
       }
       //human wins scenario
       else if (humanScore < compScore)
       {
          JOptionPane.showMessageDialog(myCardTable,new JLabel(
-            humanWinner,JLabel.CENTER),"", 
+            humanWinner,JLabel.CENTER),"Humans Rule and Robots Drool!", 
             JOptionPane.PLAIN_MESSAGE); 
       
       }
