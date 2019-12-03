@@ -12,26 +12,26 @@ public class BuildModel
 {
    private static final int MAX_PLAYERS = 50;
    private static final int NUM_STACKS = 3; // only 3 stacks for the game
-   
+
    private int numPlayers;
    private int numPacks; // # standard 52-card packs per deck
-   
+
    private int numJokersPerPack; // if 2 per pack & 3 packs per deck, get 6
    private int numUnusedCardsPerPack; // # cards removed from each pack
    private int numCardsPerHand; // # cards to deal each player
    private Card[] unusedCardsPerPack; // an array holding the cards not used
-   
+
    private Deck deck; // holds the initial full deck and gets
-   
+
    // smaller (usually) during play
    private Hand[] hand; // one Hand for each player
    public Card[] stack =  new Card[NUM_STACKS];  
-   
+
    // Variables to keep track of winnings
    private int computerScore= 0;
    private int humanScore = 0;
    private boolean deckExhausted = false;
-   
+
 
    /** 
     * Constructor that takes arguments to create a new game
@@ -81,7 +81,7 @@ public class BuildModel
       initGame();
 
    }
-   
+
    // constructor overload/default for game like bridge
    public BuildModel() 
    {
@@ -98,7 +98,7 @@ public class BuildModel
       dealToHand();  // deal cards to hands
       dealToStack(); // deal cards to the stacks
    }
-   
+
    // create a new deck and the correct number of hands. Shuffle the deck.
    public void initGame() 
    {
@@ -149,7 +149,7 @@ public class BuildModel
 
       return enoughCards;
    }
-   
+
    // deal cards to each stack
    public boolean dealToStack()
    {
@@ -164,7 +164,7 @@ public class BuildModel
             deckExhausted = true;
             return false;
          }
-             
+
       }
       return true;
    }
@@ -188,7 +188,7 @@ public class BuildModel
 
       return playerIcons;
    }
-   
+
    public Icon[] loadStackIcons()
    {
       Icon[] stackIcons = new Icon[NUM_STACKS];
@@ -206,7 +206,7 @@ public class BuildModel
    {
       return GUICard.getBackCardIcon();
    }
-   
+
    // play the indicated card for the specified player
    public Card playCard(int playerIndex, int cardIndex) 
    {
@@ -251,7 +251,7 @@ public class BuildModel
       }
       return false;
    }
-   
+
    public void addScore(int playerIndex)
    {
       if(playerIndex == 0)
@@ -259,9 +259,9 @@ public class BuildModel
 
       else if(playerIndex == 1)
          humanScore++;
-      
+
    }
-   
+
    /**
     * Retrieves the specified player's total score
     * @param playerIndex
@@ -279,7 +279,7 @@ public class BuildModel
       else
          return -1; // If input is incorrect
    }
-   
+
    public void sortHands() 
    {
       int k;
@@ -287,7 +287,7 @@ public class BuildModel
       for (k = 0; k < numPlayers; k++)
          hand[k].sort();
    }
-   
+
    // Sorts the specified player's hand
    public void sortHand(int playerIndex)
    {
@@ -300,13 +300,13 @@ public class BuildModel
       return GUICard.getIcon(card);
 
    }
-   
+
    // Returns the number of cards in a players hand
    public int getNumCardsInHand(int playerIndex)
    {
       return getHand(playerIndex).getNumCards();
    }
-   
+
 
    public Hand getHand(int k) 
    {
@@ -325,7 +325,7 @@ public class BuildModel
       {
          deckExhausted = true;
       }
-      
+
       return deck.dealCard();
    }
 
@@ -343,12 +343,12 @@ public class BuildModel
    {
       return numPlayers;
    }
-   
+
    public Card[] getStack()
    {
       return stack;
    }
-   
+
    // set the stack at stackIndex with the given card
    public boolean setStackCard(int stackIndex, Card card)
    {
@@ -1067,110 +1067,109 @@ class Deck
  * End Of Deck
  *----------------------------------------------*/
 
- 
- /**
-  * Counter class: multi-thread of the timer 
-  */
- class Counter extends Thread
- {
-    private int sec = 0;
-    private boolean threading = true;
-    JLabel timerLabel;
-    /**
-     * default constructor 
-     * calls the constructor of the Thread class
-     */
-    public Counter()
-    {
-       super();
-    }
-    /**
-     * constructor allows the caller to initialize the thread
-     * with a start time. "pause" illusion
-     */
-    public Counter(int timeStartValue)
-    {
-       // prevents incrementation 
-       this.sec = timeStartValue - 1;
-    }
-    /**
-     * updates timer
-     */
-    public void run()
-    {
-       while (threading)
-       {
-          //timer restarts to 0 after 99min
-          if (this.sec < 6000)
-          {
-             this.sec += 1;
-          } else
-          {
-             this.sec = 0;
-          }
-          // JLabel text
-          timerLabel.setText(timeFormat(sec));
-          
-          doNothing(1000); //1000 millisecond pause 
-          
-       }
-    }
-    /**
-     * Added to allow Timer class to reset timer to zero.
-     */
-    public boolean resetSec(int sec)
-    {
-       this.sec = sec;
-       return true;
-    }
-    public void setJLabel(JLabel timerLabel)
-    {
+
+/**
+ * Counter class: multi-thread of the timer 
+ */
+class Counter extends Thread
+{
+   private int sec = 0;
+   private boolean threading = true;
+   JLabel timerLabel;
+   /**
+    * default constructor 
+    * calls the constructor of the Thread class
+    */
+   public Counter()
+   {
+      super();
+   }
+   /**
+    * constructor allows the caller to initialize the thread
+    * with a start time. "pause" illusion
+    */
+   public Counter(int timeStartValue)
+   {
+      // prevents incrementation 
+      this.sec = timeStartValue - 1;
+   }
+   /**
+    * updates timer
+    */
+   public void run()
+   {
+      while (threading)
+      {
+         //timer restarts to 0 after 99min
+         if (this.sec < 6000)
+         {
+            this.sec += 1;
+         } else
+         {
+            this.sec = 0;
+         }
+         // JLabel text
+         timerLabel.setText(timeFormat(sec));
+
+         doNothing(1000); //1000 millisecond pause 
+
+      }
+   }
+   /**
+    * Added to allow Timer class to reset timer to zero.
+    */
+   public boolean resetSec(int sec)
+   {
+      this.sec = sec;
+      return true;
+   }
+   public void setJLabel(JLabel timerLabel)
+   {
       this.timerLabel = timerLabel;
-    }
-    /**
-     * terminates run() loop
-     */
-    public boolean stopThread()
-    {
-       this.threading = false;
-       return true;
-    }
-    /**
-     * return time elapsed 
-     */
-    public int secElapsed()
-    {
-       return this.sec;
-    }
-    /**
-     * returns string in mm:ss format 
-     */
-    public String timeFormat(int totalSeconds)
-    {
-       int minutes = totalSeconds / 60;
-       int sec = totalSeconds - (minutes * 60);
-       String formattedTime = String.format("%02d", minutes) + ":"
-                      + String.format("%02d", sec);
-       return formattedTime;
-    }
-    /**
-     * private helping method pauses thread to allow multi-threading 
-     */
-    private void doNothing(int milliseconds)
-    {
-       try
-       {
-          Thread.sleep(milliseconds);
-       } catch (InterruptedException e)
-       {
-          System.out.println("Unexpected interrupt");
-          System.exit(0);
-       }
-    }
-       }
-    
+   }
+   /**
+    * terminates run() loop
+    */
+   public boolean stopThread()
+   {
+      this.threading = false;
+      return true;
+   }
+   /**
+    * return time elapsed 
+    */
+   public int secElapsed()
+   {
+      return this.sec;
+   }
+   /**
+    * returns string in mm:ss format 
+    */
+   public String timeFormat(int totalSeconds)
+   {
+      int minutes = totalSeconds / 60;
+      int sec = totalSeconds - (minutes * 60);
+      String formattedTime = String.format("%02d", minutes) + ":"
+         + String.format("%02d", sec);
+      return formattedTime;
+   }
+   /**
+    * private helping method pauses thread to allow multi-threading 
+    */
+   private void doNothing(int milliseconds)
+   {
+      try
+      {
+         Thread.sleep(milliseconds);
+      } catch (InterruptedException e)
+      {
+         System.out.println("Unexpected interrupt");
+         System.exit(0);
+      }
+   }
+}
 
 
 
 
-    
+
