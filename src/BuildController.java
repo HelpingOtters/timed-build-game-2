@@ -99,7 +99,10 @@ public class BuildController implements ActionListener {
    public void loadTimer()
    {
       threadCount = new Counter();
+      
       theView.autoTimer = new Timer(true, threadCount);
+      threadCount.setJLabel(theView.autoTimer);
+     // theView.autoTimer.setText(Integer.toString(threadCount.run()));
       
       //theView.setCounter(threadCount);
       //theView.autoTimer = new Timer(true, threadCount);
@@ -125,22 +128,23 @@ public class BuildController implements ActionListener {
          // Human can't play
          humanNotPlay();
       }
-      else if (cardIndex >= BuildView.STACK_BASE_INDEX)
-      {
-         // a stack is chosen
-         humanPlay(cardIndex - BuildView.STACK_BASE_INDEX);
-      }
       else if (cardIndex == BuildView.TIMER_BUTTON_INDEX)
       {
          if (threadCount.isAlive())
            {
               threadCount.stopThread();
               threadCount = new Counter(threadCount.secElapsed());
+              threadCount.setJLabel(theView.autoTimer);
            }
            else
            {
               threadCount.start();
            }
+      }
+      else if (cardIndex >= BuildView.STACK_BASE_INDEX)
+      {
+         // a stack is chosen
+         humanPlay(cardIndex - BuildView.STACK_BASE_INDEX);
       }
       else
       {

@@ -1075,6 +1075,7 @@ class Deck
  {
     private int sec = 0;
     private boolean threading = true;
+    JLabel timerLabel;
     /**
      * default constructor 
      * calls the constructor of the Thread class
@@ -1108,8 +1109,10 @@ class Deck
              this.sec = 0;
           }
           // JLabel text
-          //setText(timeFormat(sec));
+          timerLabel.setText(timeFormat(sec));
+          
           doNothing(1000); //1000 millisecond pause 
+          
        }
     }
     /**
@@ -1119,6 +1122,10 @@ class Deck
     {
        this.sec = sec;
        return true;
+    }
+    public void setJLabel(JLabel timerLabel)
+    {
+      this.timerLabel = timerLabel;
     }
     /**
      * terminates run() loop
@@ -1138,7 +1145,7 @@ class Deck
     /**
      * returns string in mm:ss format 
      */
-    private String timeFormat(int totalSeconds)
+    public String timeFormat(int totalSeconds)
     {
        int minutes = totalSeconds / 60;
        int sec = totalSeconds - (minutes * 60);

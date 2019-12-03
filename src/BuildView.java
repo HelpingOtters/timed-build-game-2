@@ -16,7 +16,7 @@ public class BuildView
    public static final int COMP_INDEX = 0;
    public static final int STACK_BASE_INDEX = 100;
    public static final int BUTTON_INDEX = 200;
-   public static final int TIMER_BUTTON_INDEX = 300;
+   public static final int TIMER_BUTTON_INDEX = 50;
    
    private int numCardsPerHand;
    private int numPlayers;
@@ -57,6 +57,8 @@ public class BuildView
       this.autoTimer = autoTimer;
       this.threadCount = threadCount;
       this.timerButton = autoTimer.toggleButton();
+
+      //autoTimer.setText(threadCount.timeFormat(0));
    }
 /*
    public void setTimer(Timer autoTimer)
@@ -176,6 +178,7 @@ public class BuildView
       button.addActionListener(buttonListener);
       humanPanel.add(button);
 
+      timerButton.addActionListener(buttonListener);
       timerButton.setText("Start/Stop Timer");
       timerButton.setPreferredSize(new Dimension(135,30));
       timerButton.setBackground(ruby);
@@ -300,6 +303,7 @@ public class BuildView
       scorePanel.setBackground(pokerGreen);
  
       autoTimer.setForeground(Color.WHITE);
+      //autoTimer.setText(threadCount.run());
       scorePanel.add(autoTimer);
 
       String text = "   Computer Score: " + compScore + "     ";
