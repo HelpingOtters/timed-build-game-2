@@ -10,6 +10,7 @@ import java.awt.event.*;
  * GUI of the game
  *****************************************************************/
 
+
 public class BuildView
 {
    public static final int HUMAN_INDEX = 1;
