@@ -1063,7 +1063,114 @@ class Deck
       return topCard;
    }
 }
-
 /*-----------------------------------------------------
  * End Of Deck
  *----------------------------------------------*/
+
+ 
+ /**
+  * Counter class: multi-thread of the timer 
+  */
+ class Counter extends Thread
+ {
+    private int sec = 0;
+    private boolean threading = true;
+    JLabel timerLabel;
+    /**
+     * default constructor 
+     * calls the constructor of the Thread class
+     */
+    public Counter()
+    {
+       super();
+    }
+    /**
+     * constructor allows the caller to initialize the thread
+     * with a start time. "pause" illusion
+     */
+    public Counter(int timeStartValue)
+    {
+       // prevents incrementation 
+       this.sec = timeStartValue - 1;
+    }
+    /**
+     * updates timer
+     */
+    public void run()
+    {
+       while (threading)
+       {
+          //timer restarts to 0 after 99min
+          if (this.sec < 6000)
+          {
+             this.sec += 1;
+          } else
+          {
+             this.sec = 0;
+          }
+          // JLabel text
+          timerLabel.setText(timeFormat(sec));
+          
+          doNothing(1000); //1000 millisecond pause 
+          
+       }
+    }
+    /**
+     * Added to allow Timer class to reset timer to zero.
+     */
+    public boolean resetSec(int sec)
+    {
+       this.sec = sec;
+       return true;
+    }
+    public void setJLabel(JLabel timerLabel)
+    {
+      this.timerLabel = timerLabel;
+    }
+    /**
+     * terminates run() loop
+     */
+    public boolean stopThread()
+    {
+       this.threading = false;
+       return true;
+    }
+    /**
+     * return time elapsed 
+     */
+    public int secElapsed()
+    {
+       return this.sec;
+    }
+    /**
+     * returns string in mm:ss format 
+     */
+    public String timeFormat(int totalSeconds)
+    {
+       int minutes = totalSeconds / 60;
+       int sec = totalSeconds - (minutes * 60);
+       String formattedTime = String.format("%02d", minutes) + ":"
+                      + String.format("%02d", sec);
+       return formattedTime;
+    }
+    /**
+     * private helping method pauses thread to allow multi-threading 
+     */
+    private void doNothing(int milliseconds)
+    {
+       try
+       {
+          Thread.sleep(milliseconds);
+       } catch (InterruptedException e)
+       {
+          System.out.println("Unexpected interrupt");
+          System.exit(0);
+       }
+    }
+       }
+    
+
+
+
+
+    

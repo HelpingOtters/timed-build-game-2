@@ -16,6 +16,7 @@ public class BuildView
    public static final int COMP_INDEX = 0;
    public static final int STACK_BASE_INDEX = 100;
    public static final int BUTTON_INDEX = 200;
+   public static final int TIMER_BUTTON_INDEX = 50;
    
    private int numCardsPerHand;
    private int numPlayers;
@@ -34,16 +35,37 @@ public class BuildView
    
    private JLabel[] computerLabels;
    private JButton[] stackButtons; 
-   private JButton[] cardButtons;
+   private JButton[] humanCardButtons;
    private JFrame myCardTable;
+
    //Experimental by Dan
-   BuildController.Timer autoTimer = new BuildController.Timer(true);
-   private JButton timerButton = autoTimer.toggleButton();
+   Timer autoTimer; //= new Timer();// = new Timer(true);
+   private JButton timerButton;// = autoTimer.toggleButton();
    //Theme colors
    private Color pokerGreen = new Color(53,101,77);
    private Color gold = new Color(228,131,0);
    private Color ruby = new Color(88,7,37);
 
+   private Counter threadCount;
+
+   /*public void setCounter(Counter threadCounter)
+   {
+      this.threadCount = threadCount;
+   }*/
+   public void setTimer(Timer autoTimer, Counter threadCount)
+   {
+      this.autoTimer = autoTimer;
+      this.threadCount = threadCount;
+      this.timerButton = autoTimer.toggleButton();
+
+      //autoTimer.setText(threadCount.timeFormat(0));
+   }
+/*
+   public void setTimer(Timer autoTimer)
+   {
+      this.autoTimer = autoTimer;
+   }
+*/
    /**
     * Constructor that takes the number of cards per hand and number of players
     * @param numCardsPerHand
@@ -63,7 +85,7 @@ public class BuildView
    {
       computerLabels = new JLabel[numCardsPerHand];
       stackButtons  = new JButton[numStacks]; 
-      cardButtons = new JButton[numCardsPerHand];
+      humanCardButtons = new JButton[numCardsPerHand];
 
       // Establish main frame in which program will run
       myCardTable = new JFrame("Build Game");
@@ -78,7 +100,6 @@ public class BuildView
       pnlComputerHand = new JPanel();
       pnlHumanHand = new JPanel();
       pnlPlayArea = new JPanel();
-   
       
       // Set up layout for panels
       pnlPlayArea.setLayout(new BorderLayout());
@@ -86,7 +107,6 @@ public class BuildView
       pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
 
       // define panels for the play area
-      //stackPanel = new JPanel(new GridLayout());
       stackPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -97,19 +117,8 @@ public class BuildView
       
 
       //forces the sizes to keep the panels even
-      theDeckPanel.setPreferredSize(new Dimension(135,200));
-      scorePanel.setPreferredSize(new Dimension(135,200));
-      //theDeckPanel = new JPanel(new GridLayout(3,1));
-
-      //testing sizes
-      /*
-      stackPanel.setBorder(new LineBorder(Color.BLACK));
-      scorePanel.setBorder(new LineBorder(Color.BLACK));
-      theDeckPanel.setBorder(new LineBorder(Color.BLACK));
-      System.out.println(theDeckPanel.getSize());
-
-      */
-      theDeckPanel.setBorder(new LineBorder(Color.BLACK));
+      theDeckPanel.setPreferredSize(new Dimension(150,200));
+      scorePanel.setPreferredSize(new Dimension(150,200));
 
       //set background color
       pnlPlayArea.setBackground(pokerGreen);
@@ -147,18 +156,8 @@ public class BuildView
 
       // show everything to the user
       myCardTable.setVisible(true);
-
    }
 
-   /**
-    * 
-    *
-   public Boolean isAlive()
-   {
-      System.out.println(autoTimer);
-      return false;
-   }
-   */
    public void createComputerStatus()
    {
       computerPanel.setVisible(false);
@@ -179,11 +178,14 @@ public class BuildView
       button.addActionListener(buttonListener);
       humanPanel.add(button);
 
+      timerButton.addActionListener(buttonListener);
       timerButton.setText("Start/Stop Timer");
       timerButton.setPreferredSize(new Dimension(135,30));
       timerButton.setBackground(ruby);
       timerButton.setForeground(Color.white);
+      timerButton.setActionCommand(Integer.toString(TIMER_BUTTON_INDEX));
       humanPanel.add(timerButton);
+      //humanPanel.add(autoTimer.toggleButton());
      
       humanPanel.setVisible(true);
    }
@@ -237,14 +239,14 @@ public class BuildView
       for (int index = 0; index < cardIcons.length; index++)
       {
          // Create buttons for each of the human cards
-         cardButtons[index] = new JButton(cardIcons[index]);
-         cardButtons[index].setPreferredSize(new Dimension(73,97));
-         cardButtons[index].setBorder(BorderFactory.createLineBorder(Color.black));
-         cardButtons[index].setActionCommand(Integer.toString(index));
-         cardButtons[index].addActionListener(buttonListener);
+         humanCardButtons[index] = new JButton(cardIcons[index]);
+         humanCardButtons[index].setPreferredSize(new Dimension(73,97));
+         humanCardButtons[index].setBorder(BorderFactory.createLineBorder(Color.black));
+         humanCardButtons[index].setActionCommand(Integer.toString(index));
+         humanCardButtons[index].addActionListener(buttonListener);
          
          // add human's card buttons to the table
-         pnlHumanHand.add(cardButtons[index]);
+         pnlHumanHand.add(humanCardButtons[index]);
       }
      myCardTable.setVisible(true);
      pnlHumanHand.setVisible(true);
@@ -299,20 +301,9 @@ public class BuildView
       scorePanel.removeAll();
       scorePanel.setVisible(false);
       scorePanel.setBackground(pokerGreen);
-      /*
-      BuildController.Timer autoTimer = new BuildController.Timer(true);
-      JButton timerToggler = autoTimer.toggleButton();
-      timerToggler.setText("Start/Stop Timer");
-
+ 
       autoTimer.setForeground(Color.WHITE);
-      timerToggler.setPreferredSize(new Dimension());
-      System.out.println("Button size: " + timerToggler.getSize());
-
-      scorePanel.add(timerToggler);
-      scorePanel.add(autoTimer);
-      */
-      //autoTimer.setBorder(new LineBorder(Color.WHITE));
-      autoTimer.setForeground(Color.WHITE);
+      //autoTimer.setText(threadCount.run());
       scorePanel.add(autoTimer);
 
       String text = "   Computer Score: " + compScore + "     ";
@@ -339,13 +330,13 @@ public class BuildView
    
    public void highlightCard(int cardIndex)
    {
-      cardButtons[cardIndex].setBorder(BorderFactory.createMatteBorder(
+      humanCardButtons[cardIndex].setBorder(BorderFactory.createMatteBorder(
          1, 5, 5, 1, Color.orange));
    }
    
    public void unhighlightCard(int cardIndex)
    {
-      cardButtons[cardIndex].setBorder(BorderFactory.createLineBorder(Color.black));
+      humanCardButtons[cardIndex].setBorder(BorderFactory.createLineBorder(Color.black));
    }
    
    
@@ -415,7 +406,7 @@ class CardTable extends JFrame
     * @param numCardsPerHand
     * @param numPlayers
     */
-   public CardTable(String title, int numCardsPerHand, int numPlayers) 
+   public CardTable(String title, int numCardsPerHand, int numPlayers, Timer autoTimer) 
    {
       // displays title on window
       super(title);
@@ -442,14 +433,13 @@ class CardTable extends JFrame
       add(pnlHumanHand, BorderLayout.SOUTH);
       add(pnlTimerArea, BorderLayout.EAST);    
       
-      BuildController.Timer autoTimer = new BuildController.Timer(true);
+      autoTimer = new Timer(true);
       JButton timerToggler = autoTimer.toggleButton();
       timerToggler.setText("Start/Stop Timer");
 
       pnlTimerArea.add(timerToggler);
       pnlTimerArea.add(autoTimer);
       
-
       // labels the borders and sets the colors
       TitledBorder playAreaBorder = new TitledBorder("Community");
       playAreaBorder.setTitleColor(new Color(228,132,0));
@@ -479,4 +469,72 @@ class CardTable extends JFrame
    {
       return numPlayers;
    }
+
+   
+}
+
+ @SuppressWarnings("serial")
+ class Timer extends JLabel 
+ {
+    Counter threadCount;
+    private JButton timerButton = new JButton();
+    //private Counter threadCount = new Counter();
+
+    /**
+     * default constructor
+     */
+    public Timer()
+    {
+       //timerButton.addActionListener(this);
+       this.setHorizontalAlignment(SwingConstants.CENTER);
+       setFont(new Font("Adobe Caslon", Font.BOLD, 25));
+    }
+
+    /**
+     * constuctor allows creation of start of time 
+     */
+    public Timer(boolean startTimerNow, Counter threadCount)
+    {
+       this(); //call to the default constructor
+       //this.threadCount = threadCount;
+       if (startTimerNow)
+       {
+          threadCount.start();
+       }
+    }
+
+    /**
+     * @return a JButton 
+     * start and stop the timer
+     */
+    public JButton toggleButton()
+    {
+       return timerButton;
+    }
+
+    /**
+     * resets timer to 0s
+     */
+    public boolean resetTimer()
+    {
+       this.threadCount.resetSec(0);
+       return true;
+    }
+
+    /**
+     * action listener to start and stop the timer. "pause" functionality
+     *
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+       if (threadCount.isAlive())
+       {
+          threadCount.stopThread();
+          threadCount = new Counter(threadCount.secElapsed());
+       } else
+       {
+          threadCount.start();
+       }
+    }
+    */
 }

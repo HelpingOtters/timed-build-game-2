@@ -257,7 +257,7 @@ public class GameController implements ActionListener
           /**
            * returns string in mm:ss format 
            */
-          private String timeFormat(int totalSeconds)
+          public String timeFormat(int totalSeconds)
           {
              int minutes = totalSeconds / 60;
              int sec = totalSeconds - (minutes * 60);

@@ -13,6 +13,7 @@ import java.awt.event.*;
 public class BuildController implements ActionListener {
    private BuildModel theModel;
    private BuildView theView;
+   private Counter threadCount;// = new Counter();
 
    private int HUMAN = 1;
    private int COMPUTER = 0;
@@ -20,7 +21,7 @@ public class BuildController implements ActionListener {
    private boolean humanPlayed = false; // human starts first
    private boolean compPlayed = true;
    private boolean humanTurn = true;
-   private int humanCardIndex = -1;
+   private int humanCardIndex = -1; // Intalizing the location of the first human card
 
    /**
     * Constructor that starts a new game using a model and a view
@@ -31,14 +32,17 @@ public class BuildController implements ActionListener {
    public BuildController(BuildModel model, BuildView view) {
       theModel = model;
       theView = view;
-
+  
       theModel.startNewGame();
       theView.createTable();
 
       theView.createComputerStatus();
+      loadTimer();
       theView.createHumanButton(this);
 
       loadDeck();
+      
+      
 
       loadPlayerHands();
       loadStack();
@@ -92,6 +96,18 @@ public class BuildController implements ActionListener {
          theView.createDeckLabels(theModel.getBackCardIcon(),x); 
       }
    }
+   public void loadTimer()
+   {
+      threadCount = new Counter();
+      
+      theView.autoTimer = new Timer(true, threadCount);
+      threadCount.setJLabel(theView.autoTimer);
+     // theView.autoTimer.setText(Integer.toString(threadCount.run()));
+      
+      //theView.setCounter(threadCount);
+      //theView.autoTimer = new Timer(true, threadCount);
+      theView.setTimer(theView.autoTimer, threadCount);
+   }
    
    /**
    * Action event that is fired every time the user clicks a card button
@@ -112,10 +128,23 @@ public class BuildController implements ActionListener {
          // Human can't play
          humanNotPlay();
       }
+      else if (cardIndex == BuildView.TIMER_BUTTON_INDEX)
+      {
+         if (threadCount.isAlive())
+           {
+              threadCount.stopThread();
+              threadCount = new Counter(threadCount.secElapsed());
+              threadCount.setJLabel(theView.autoTimer);
+           }
+           else
+           {
+              threadCount.start();
+           }
+      }
       else if (cardIndex >= BuildView.STACK_BASE_INDEX)
       {
          // a stack is chosen
-         playCardOnStack(cardIndex - BuildView.STACK_BASE_INDEX);
+         humanPlay(cardIndex - BuildView.STACK_BASE_INDEX);
       }
       else
       {
@@ -247,7 +276,7 @@ public class BuildController implements ActionListener {
       }
    }
 
-   private void playCardOnStack(int stackIndex)
+   private void humanPlay(int stackIndex)
    {
       if(humanCardIndex >= 0)
       {
@@ -313,11 +342,31 @@ public class BuildController implements ActionListener {
       System.exit(0);
 
    }
-
+   /*
+   public class TimerListener implements ActionListener
+   {
+      /**
+        * action listener to start and stop the timer. "pause" functionality
+        *
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+           if (threadCount.isAlive())
+           {
+              threadCount.stopThread();
+              threadCount = new Counter(threadCount.secElapsed());
+           } else
+           {
+              threadCount.start();
+           }
+        }
+   }
+   */
+/*
    /**
     * Timer class 
-    */
-
+    *
+    *
     @SuppressWarnings("serial")
     public static class Timer extends JLabel implements ActionListener
     {
@@ -326,7 +375,7 @@ public class BuildController implements ActionListener {
  
        /**
         * default constructor
-        */
+        *
        public Timer()
        {
           timerButton.addActionListener(this);
@@ -336,10 +385,10 @@ public class BuildController implements ActionListener {
  
        /**
         * constuctor allows creation of start of time 
-        */
+        *
        public Timer(boolean startTimerNow)
        {
-          this(); // call to the default constructor
+          this(); //call to the default constructor
           if (startTimerNow)
           {
              threadCount.start();
@@ -349,7 +398,7 @@ public class BuildController implements ActionListener {
        /**
         * @return a JButton 
         * start and stop the timer
-        */
+        *
        public JButton toggleButton()
        {
           return timerButton;
@@ -357,7 +406,7 @@ public class BuildController implements ActionListener {
  
        /**
         * resets timer to 0s
-        */
+        *
        public boolean resetTimer()
        {
           this.threadCount.resetSec(0);
@@ -366,7 +415,7 @@ public class BuildController implements ActionListener {
  
        /**
         * action listener to start and stop the timer. "pause" functionality
-        */
+        *
        @Override
        public void actionPerformed(ActionEvent e)
        {
@@ -382,7 +431,7 @@ public class BuildController implements ActionListener {
  
        /**
         * Counter class: multi-thread of the timer 
-        */
+        *
        public class Counter extends Thread
        {
           private int sec = 0;
@@ -391,7 +440,7 @@ public class BuildController implements ActionListener {
           /**
            * default constructor 
            * calls the constructor of the Thread class
-           */
+           *
           public Counter()
           {
              super();
@@ -400,7 +449,7 @@ public class BuildController implements ActionListener {
           /**
            * constructor allows the caller to initialize the thread
            * with a start time. "pause" illusion
-           */
+           *
           public Counter(int timeStartValue)
           {
              // prevents incrementation 
@@ -409,7 +458,7 @@ public class BuildController implements ActionListener {
  
           /**
            * updates timer
-           */
+           *
           public void run()
           {
              while (threading)
@@ -424,13 +473,13 @@ public class BuildController implements ActionListener {
                 }
                 // JLabel text
                 setText(timeFormat(sec));
-                doNothing(1000); //100 millisecond pause 
+                doNothing(1000); //1000 millisecond pause 
              }
           }
  
           /**
            * Added to allow Timer class to reset timer to zero.
-           */
+           *
           public boolean resetSec(int sec)
           {
              this.sec = sec;
@@ -439,7 +488,7 @@ public class BuildController implements ActionListener {
  
           /**
            * terminates run() loop
-           */
+           *
           public boolean stopThread()
           {
              this.threading = false;
@@ -448,7 +497,7 @@ public class BuildController implements ActionListener {
  
           /**
            * return time elapsed 
-           */
+           *
           public int secElapsed()
           {
              return this.sec;
@@ -456,7 +505,7 @@ public class BuildController implements ActionListener {
  
           /**
            * returns string in mm:ss format 
-           */
+           *
           private String timeFormat(int totalSeconds)
           {
              int minutes = totalSeconds / 60;
@@ -468,7 +517,7 @@ public class BuildController implements ActionListener {
  
           /**
            * private helping method pauses thread to allow multi-threading 
-           */
+           *
           private void doNothing(int milliseconds)
           {
              try
@@ -480,7 +529,9 @@ public class BuildController implements ActionListener {
                 System.exit(0);
              }
           }
+          
        }
-    }
+       
+      }*/
  
 }
