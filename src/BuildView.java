@@ -16,6 +16,7 @@ public class BuildView
    public static final int COMP_INDEX = 0;
    public static final int STACK_BASE_INDEX = 100;
    public static final int BUTTON_INDEX = 200;
+   public static final int TIMER_BUTTON_INDEX = 300;
    
    private int numCardsPerHand;
    private int numPlayers;
@@ -36,14 +37,33 @@ public class BuildView
    private JButton[] stackButtons; 
    private JButton[] humanCardButtons;
    private JFrame myCardTable;
+
    //Experimental by Dan
-   BuildController.Timer autoTimer = new BuildController.Timer(true);
-   private JButton timerButton = autoTimer.toggleButton();
+   Timer autoTimer; //= new Timer();// = new Timer(true);
+   private JButton timerButton;// = autoTimer.toggleButton();
    //Theme colors
    private Color pokerGreen = new Color(53,101,77);
    private Color gold = new Color(228,131,0);
    private Color ruby = new Color(88,7,37);
 
+   private Counter threadCount;
+
+   /*public void setCounter(Counter threadCounter)
+   {
+      this.threadCount = threadCount;
+   }*/
+   public void setTimer(Timer autoTimer, Counter threadCount)
+   {
+      this.autoTimer = autoTimer;
+      this.threadCount = threadCount;
+      this.timerButton = autoTimer.toggleButton();
+   }
+/*
+   public void setTimer(Timer autoTimer)
+   {
+      this.autoTimer = autoTimer;
+   }
+*/
    /**
     * Constructor that takes the number of cards per hand and number of players
     * @param numCardsPerHand
@@ -160,7 +180,9 @@ public class BuildView
       timerButton.setPreferredSize(new Dimension(135,30));
       timerButton.setBackground(ruby);
       timerButton.setForeground(Color.white);
+      timerButton.setActionCommand(Integer.toString(TIMER_BUTTON_INDEX));
       humanPanel.add(timerButton);
+      //humanPanel.add(autoTimer.toggleButton());
      
       humanPanel.setVisible(true);
    }
@@ -380,7 +402,7 @@ class CardTable extends JFrame
     * @param numCardsPerHand
     * @param numPlayers
     */
-   public CardTable(String title, int numCardsPerHand, int numPlayers) 
+   public CardTable(String title, int numCardsPerHand, int numPlayers, Timer autoTimer) 
    {
       // displays title on window
       super(title);
@@ -407,7 +429,7 @@ class CardTable extends JFrame
       add(pnlHumanHand, BorderLayout.SOUTH);
       add(pnlTimerArea, BorderLayout.EAST);    
       
-      BuildController.Timer autoTimer = new BuildController.Timer(true);
+      autoTimer = new Timer(true);
       JButton timerToggler = autoTimer.toggleButton();
       timerToggler.setText("Start/Stop Timer");
 
@@ -443,4 +465,72 @@ class CardTable extends JFrame
    {
       return numPlayers;
    }
+
+   
+}
+
+ @SuppressWarnings("serial")
+ class Timer extends JLabel 
+ {
+    Counter threadCount;
+    private JButton timerButton = new JButton();
+    //private Counter threadCount = new Counter();
+
+    /**
+     * default constructor
+     */
+    public Timer()
+    {
+       //timerButton.addActionListener(this);
+       this.setHorizontalAlignment(SwingConstants.CENTER);
+       setFont(new Font("Adobe Caslon", Font.BOLD, 25));
+    }
+
+    /**
+     * constuctor allows creation of start of time 
+     */
+    public Timer(boolean startTimerNow, Counter threadCount)
+    {
+       this(); //call to the default constructor
+       //this.threadCount = threadCount;
+       if (startTimerNow)
+       {
+          threadCount.start();
+       }
+    }
+
+    /**
+     * @return a JButton 
+     * start and stop the timer
+     */
+    public JButton toggleButton()
+    {
+       return timerButton;
+    }
+
+    /**
+     * resets timer to 0s
+     */
+    public boolean resetTimer()
+    {
+       this.threadCount.resetSec(0);
+       return true;
+    }
+
+    /**
+     * action listener to start and stop the timer. "pause" functionality
+     *
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+       if (threadCount.isAlive())
+       {
+          threadCount.stopThread();
+          threadCount = new Counter(threadCount.secElapsed());
+       } else
+       {
+          threadCount.start();
+       }
+    }
+    */
 }
