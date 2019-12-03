@@ -10,7 +10,6 @@ import java.awt.event.*;
  * Communicates between the view and model classes
  *****************************************************************/
 
-
 public class BuildController implements ActionListener
 {
    private BuildModel theModel;

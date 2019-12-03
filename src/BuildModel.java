@@ -8,7 +8,6 @@ import javax.swing.*;
  * data of the card game
  *****************************************************************/
 
-
 public class BuildModel
 {
    private static final int MAX_PLAYERS = 50;
