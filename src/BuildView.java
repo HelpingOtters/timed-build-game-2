@@ -78,7 +78,6 @@ public class BuildView
       pnlComputerHand = new JPanel();
       pnlHumanHand = new JPanel();
       pnlPlayArea = new JPanel();
-   
       
       // Set up layout for panels
       pnlPlayArea.setLayout(new BorderLayout());
@@ -86,7 +85,6 @@ public class BuildView
       pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
 
       // define panels for the play area
-      //stackPanel = new JPanel(new GridLayout());
       stackPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
       computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -94,17 +92,8 @@ public class BuildView
       theDeckPanel = new JPanel(new CardLayout());
 
       //forces the sizes to keep the panels even
-      theDeckPanel.setPreferredSize(new Dimension(135,200));
-      scorePanel.setPreferredSize(new Dimension(135,200));
-      //theDeckPanel = new JPanel(new GridLayout(3,1));
-
-      //testing sizes
-      /*
-      stackPanel.setBorder(new LineBorder(Color.BLACK));
-      scorePanel.setBorder(new LineBorder(Color.BLACK));
-      theDeckPanel.setBorder(new LineBorder(Color.BLACK));
-      System.out.println(theDeckPanel.getSize());
-      */
+      theDeckPanel.setPreferredSize(new Dimension(150,200));
+      scorePanel.setPreferredSize(new Dimension(150,200));
 
       //set background color
       pnlPlayArea.setBackground(pokerGreen);
@@ -142,18 +131,8 @@ public class BuildView
 
       // show everything to the user
       myCardTable.setVisible(true);
-
    }
 
-   /**
-    * 
-    *
-   public Boolean isAlive()
-   {
-      System.out.println(autoTimer);
-      return false;
-   }
-   */
    public void createComputerStatus()
    {
       computerPanel.setVisible(false);
@@ -282,19 +261,7 @@ public class BuildView
       scorePanel.removeAll();
       scorePanel.setVisible(false);
       scorePanel.setBackground(pokerGreen);
-      /*
-      BuildController.Timer autoTimer = new BuildController.Timer(true);
-      JButton timerToggler = autoTimer.toggleButton();
-      timerToggler.setText("Start/Stop Timer");
-
-      autoTimer.setForeground(Color.WHITE);
-      timerToggler.setPreferredSize(new Dimension());
-      System.out.println("Button size: " + timerToggler.getSize());
-
-      scorePanel.add(timerToggler);
-      scorePanel.add(autoTimer);
-      */
-      //autoTimer.setBorder(new LineBorder(Color.WHITE));
+ 
       autoTimer.setForeground(Color.WHITE);
       scorePanel.add(autoTimer);
 
@@ -432,7 +399,6 @@ class CardTable extends JFrame
       pnlTimerArea.add(timerToggler);
       pnlTimerArea.add(autoTimer);
       
-
       // labels the borders and sets the colors
       TitledBorder playAreaBorder = new TitledBorder("Community");
       playAreaBorder.setTitleColor(new Color(228,132,0));

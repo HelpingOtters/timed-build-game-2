@@ -113,7 +113,7 @@ public class BuildController implements ActionListener {
       else if (cardIndex >= BuildView.STACK_BASE_INDEX)
       {
          // a stack is chosen
-         playCardOnStack(cardIndex - BuildView.STACK_BASE_INDEX);
+         humanPlay(cardIndex - BuildView.STACK_BASE_INDEX);
       }
       else
       {
@@ -245,7 +245,7 @@ public class BuildController implements ActionListener {
       }
    }
 
-   private void playCardOnStack(int stackIndex)
+   private void humanPlay(int stackIndex)
    {
       if(humanCardIndex >= 0)
       {
@@ -421,7 +421,7 @@ public class BuildController implements ActionListener {
                 }
                 // JLabel text
                 setText(timeFormat(sec));
-                doNothing(100); //100 millisecond pause 
+                doNothing(1000); //100 millisecond pause 
              }
           }
  
