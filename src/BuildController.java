@@ -20,7 +20,7 @@ public class BuildController implements ActionListener {
    private boolean humanPlayed = false; // human starts first
    private boolean compPlayed = true;
    private boolean humanTurn = true;
-   private int humanCardIndex = -1;
+   private int humanCardIndex = -1; // Intalizing the location of the first human card
 
    /**
     * Constructor that starts a new game using a model and a view
@@ -336,7 +336,7 @@ public class BuildController implements ActionListener {
         */
        public Timer(boolean startTimerNow)
        {
-          this(); // call to the default constructor
+          this(); //call to the default constructor
           if (startTimerNow)
           {
              threadCount.start();
@@ -421,7 +421,7 @@ public class BuildController implements ActionListener {
                 }
                 // JLabel text
                 setText(timeFormat(sec));
-                doNothing(1000); //100 millisecond pause 
+                doNothing(1000); //1000 millisecond pause 
              }
           }
  

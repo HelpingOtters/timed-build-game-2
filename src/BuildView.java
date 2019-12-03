@@ -34,7 +34,7 @@ public class BuildView
    
    private JLabel[] computerLabels;
    private JButton[] stackButtons; 
-   private JButton[] cardButtons;
+   private JButton[] humanCardButtons;
    private JFrame myCardTable;
    //Experimental by Dan
    BuildController.Timer autoTimer = new BuildController.Timer(true);
@@ -63,7 +63,7 @@ public class BuildView
    {
       computerLabels = new JLabel[numCardsPerHand];
       stackButtons  = new JButton[numStacks]; 
-      cardButtons = new JButton[numCardsPerHand];
+      humanCardButtons = new JButton[numCardsPerHand];
 
       // Establish main frame in which program will run
       myCardTable = new JFrame("Build Game");
@@ -211,14 +211,14 @@ public class BuildView
       for (int index = 0; index < cardIcons.length; index++)
       {
          // Create buttons for each of the human cards
-         cardButtons[index] = new JButton(cardIcons[index]);
-         cardButtons[index].setPreferredSize(new Dimension(73,97));
-         cardButtons[index].setBorder(BorderFactory.createLineBorder(Color.black));
-         cardButtons[index].setActionCommand(Integer.toString(index));
-         cardButtons[index].addActionListener(buttonListener);
+         humanCardButtons[index] = new JButton(cardIcons[index]);
+         humanCardButtons[index].setPreferredSize(new Dimension(73,97));
+         humanCardButtons[index].setBorder(BorderFactory.createLineBorder(Color.black));
+         humanCardButtons[index].setActionCommand(Integer.toString(index));
+         humanCardButtons[index].addActionListener(buttonListener);
          
          // add human's card buttons to the table
-         pnlHumanHand.add(cardButtons[index]);
+         pnlHumanHand.add(humanCardButtons[index]);
       }
      myCardTable.setVisible(true);
      pnlHumanHand.setVisible(true);
@@ -289,13 +289,13 @@ public class BuildView
    
    public void highlightCard(int cardIndex)
    {
-      cardButtons[cardIndex].setBorder(BorderFactory.createMatteBorder(
+      humanCardButtons[cardIndex].setBorder(BorderFactory.createMatteBorder(
          1, 5, 5, 1, Color.orange));
    }
    
    public void unhighlightCard(int cardIndex)
    {
-      cardButtons[cardIndex].setBorder(BorderFactory.createLineBorder(Color.black));
+      humanCardButtons[cardIndex].setBorder(BorderFactory.createLineBorder(Color.black));
    }
    
    
