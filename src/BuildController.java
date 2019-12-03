@@ -356,15 +356,6 @@ public class BuildController implements ActionListener {
        }
  
        /**
-        * resets timer to 0s
-        */
-       public boolean resetTimer()
-       {
-          this.threadCount.resetSec(0);
-          return true;
-       }
- 
-       /**
         * action listener to start and stop the timer. "pause" functionality
         */
        @Override
