@@ -342,11 +342,12 @@ public class BuildController implements ActionListener {
       System.exit(0);
 
    }
+   /*
    public class TimerListener implements ActionListener
    {
       /**
         * action listener to start and stop the timer. "pause" functionality
-        */
+        *
         @Override
         public void actionPerformed(ActionEvent e)
         {
@@ -360,6 +361,7 @@ public class BuildController implements ActionListener {
            }
         }
    }
+   */
 /*
    /**
     * Timer class 
