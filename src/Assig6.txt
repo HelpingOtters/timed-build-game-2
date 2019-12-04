@@ -1,3 +1,9 @@
+import java.util.Random;
+import javax.swing.*;
+import java.awt.*;
+import javax.swing.border.*;
+import java.awt.event.*;
+
 /************************************************************************
  * MVC Pattern Design for Build game
  * 
@@ -30,9 +36,6 @@ public class MVCBuild
       BuildController gameController = new BuildController(gameModel, gameView);
    }
 }
-
-import java.util.Random;
-import javax.swing.*;
 
 /****************************************************************
  * BuildModel
@@ -1287,11 +1290,6 @@ class Timer extends Thread
    }
 }
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.event.*;
-
 /****************************************************************
  * GameView
  * 
@@ -1718,8 +1716,7 @@ class TimerLabel extends JLabel
       return true;
    }
 }
-import javax.swing.*;
-import java.awt.event.*;
+
 
 /****************************************************************
  * BuildController
@@ -1977,7 +1974,7 @@ class BuildController implements ActionListener
                {
                   // game continues
                   Icon compLabel = GUICard.getBackCardIcon(); // back side of
-                                                              // the card
+                  // the card
                   // Display info with the GameView class
                   theView.createCompLabels(compLabel, theModel.getHand(COMPUTER)
                      .getNumCards());
