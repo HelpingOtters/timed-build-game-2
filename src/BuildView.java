@@ -45,17 +45,15 @@ public class BuildView
    private Color gold = new Color(228,131,0);
    private Color ruby = new Color(88,7,37);
 
-   private Counter threadCount;
-
   /**
    * Recives the timer from the controller
    * @param autoTimer
    * @param threadCount
    */
-   public void setTimer(TimerLabel autoTimer, Counter threadCount)
+   public void setTimerLabel(TimerLabel autoTimer)
    {
       this.autoTimer = autoTimer;
-      this.threadCount = threadCount;
+      //this.timerCount = timerCount;
       this.timerButton = autoTimer.toggleButton();
    }
 
@@ -63,7 +61,7 @@ public class BuildView
     * Returns timer object
     * @return autoTimer
     */
-   public TimerLabel getTimer()
+   public TimerLabel getTimerLabel()
    {
       return autoTimer;
    }
@@ -375,9 +373,8 @@ public class BuildView
 @SuppressWarnings("serial")
 class TimerLabel extends JLabel 
 {
-   Counter threadCount;
+   Timer timerCount;
    private JButton timerButton = new JButton();
-   //private Counter threadCount = new Counter();
 
    /**
     * default constructor
@@ -392,13 +389,13 @@ class TimerLabel extends JLabel
    /**
     * constuctor allows creation of start of time 
     */
-   public TimerLabel(boolean startTimerNow, Counter threadCount)
+   public TimerLabel(boolean startTimerNow, Timer timerCount)
    {
       this(); //call to the default constructor
-      //this.threadCount = threadCount;
+     
       if (startTimerNow)
       {
-         threadCount.start();
+         timerCount.start();
       }
    }
 
@@ -416,7 +413,7 @@ class TimerLabel extends JLabel
     */
    public boolean resetTimer()
    {
-      this.threadCount.resetSec(0);
+      this.timerCount.resetSec(0);
       return true;
    }
 }

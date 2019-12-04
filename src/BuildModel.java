@@ -1147,7 +1147,7 @@ class Deck
 /**
  * Counter class: multi-thread of the timer
  */
-class Counter extends Thread
+class Timer extends Thread
 {
    private int sec = 0;
    private boolean threading = true;
@@ -1156,7 +1156,7 @@ class Counter extends Thread
    /**
     * default constructor calls the constructor of the Thread class
     */
-   public Counter()
+   public Timer()
    {
       super();
    }
@@ -1165,7 +1165,7 @@ class Counter extends Thread
     * constructor allows the caller to initialize the thread with a start time.
     * "pause" illusion
     */
-   public Counter(int timeStartValue)
+   public Timer(int timeStartValue)
    {
       // prevents incrementation
       this.sec = timeStartValue - 1;

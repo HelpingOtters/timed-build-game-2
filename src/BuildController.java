@@ -12,7 +12,6 @@ public class BuildController implements ActionListener
 {
    private BuildModel theModel;
    private BuildView theView;
-   private Counter threadCount;// = new Counter();
 
    private int HUMAN = 1; // Index for human hand
    private int COMPUTER = 0; // Index for computer hand
@@ -22,7 +21,8 @@ public class BuildController implements ActionListener
    private boolean humanTurn = true; // false for computer turn
    private int humanCardIndex = -1; // no card is selected in human hand
 
-   private TimerLabel timer;// = new TimerLabel(true, threadCount);
+   private TimerLabel timerLabel;
+   private Timer timerCount;
 
    /**
     * Constructor that starts a new game using a model and a view
@@ -112,11 +112,11 @@ public class BuildController implements ActionListener
     */
    public void loadTimer()
    {
-      threadCount = new Counter();
-      timer = new TimerLabel(true,threadCount);
+      timerCount = new Timer();
+      timerLabel = new TimerLabel(true, timerCount);
 
-      theView.setTimer(timer, threadCount);
-      threadCount.setJLabel(theView.getTimer());
+      theView.setTimerLabel(timerLabel);
+      timerCount.setJLabel(theView.getTimerLabel());
    }
 
    /**
@@ -139,16 +139,15 @@ public class BuildController implements ActionListener
       else if (cardIndex == BuildView.TIMER_BUTTON_INDEX)
       {
          // timer is toggled
-         if (threadCount.isAlive())
+         if (timerCount.isAlive())
          {
-            threadCount.stopThread();
-            threadCount = new Counter(threadCount.secElapsed());
-            //threadCount.setJLabel(theView.autoTimer);
-            threadCount.setJLabel(theView.getTimer());
+            timerCount.stopThread();
+            timerCount = new Timer(timerCount.secElapsed());
+            timerCount.setJLabel(theView.getTimerLabel());
          }
          else
          {
-            threadCount.start();
+            timerCount.start();
          }
       }
       else if (cardIndex >= BuildView.STACK_BASE_INDEX)
