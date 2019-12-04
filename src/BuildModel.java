@@ -80,7 +80,6 @@ public class BuildModel
 
       // prepare deck and shuffle
       initGame();
-
    }
 
    /**
@@ -100,7 +99,6 @@ public class BuildModel
    public void startNewGame()
    {
       GUICard.loadCardIcons();
-
       dealToHand(); // deal cards to hands
       dealToStack(); // deal cards to the stacks
    }
@@ -159,7 +157,6 @@ public class BuildModel
                break;
             }
       }
-
       return enoughCards;
    }
 
@@ -182,7 +179,6 @@ public class BuildModel
             deckExhausted = true;
             return false;
          }
-
       }
       return true;
    }
@@ -301,7 +297,6 @@ public class BuildModel
 
       else if (playerIndex == 1)
          humanScore++; // increment the human score
-
    }
 
    /**
@@ -353,7 +348,6 @@ public class BuildModel
    public Icon getCardIcon(Card card)
    {
       return GUICard.getIcon(card);
-
    }
 
    /**
@@ -533,7 +527,6 @@ class GUICard
       // invalid suit
       return -1;
    }
-
 }
 
 /*-----------------------------------------------------
