@@ -1,3 +1,36 @@
+/************************************************************************
+ * MVC Pattern Design for Build game
+ * 
+ * @author Max Halbert, Dan Sedano, Ricardo Barbosa, Lindsey Reynolds
+ * 
+ ***********************************************************************/
+
+public class MVCBuild
+{
+   public static void main(String[] args)
+   {
+      final int NUM_CARDS_PER_HAND = 7;
+      final int NUM_PLAYERS = 2;
+      final int NUM_STACKS = 3;
+      int numPacksPerDeck = 1;
+      int numJokersPerPack = 4;
+      int numUnusedCardsPerPack = 0;
+      Card[] unusedCardsPerPack = null;
+
+      // Create the model
+      BuildModel gameModel = new BuildModel(numPacksPerDeck, numJokersPerPack,
+         numUnusedCardsPerPack, unusedCardsPerPack, NUM_PLAYERS,
+         NUM_CARDS_PER_HAND);
+
+      // Create the view
+      BuildView gameView = new BuildView(NUM_CARDS_PER_HAND, NUM_PLAYERS,
+         NUM_STACKS);
+
+      // Create the controller
+      BuildController gameController = new BuildController(gameModel, gameView);
+   }
+}
+
 import java.util.Random;
 import javax.swing.*;
 
@@ -8,7 +41,7 @@ import javax.swing.*;
  * data of the card game
  *****************************************************************/
 
-public class BuildModel
+class BuildModel
 {
    private static final int MAX_PLAYERS = 50;
    private static final int NUM_STACKS = 3; // only 3 stacks for the game
@@ -1203,10 +1236,12 @@ class Timer extends Thread
       this.sec = sec;
       return true;
    }
+
    public void setJLabel(JLabel timerLabel)
    {
       this.timerLabel = timerLabel;
    }
+
    /**
     * terminates run() loop
     */
@@ -1250,4 +1285,817 @@ class Timer extends Thread
          System.exit(0);
       }
    }
+}
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.event.*;
+
+/****************************************************************
+ * GameView
+ * 
+ * Description: Displays the game UI components to the user Usage: Updates the
+ * GUI of the game
+ *****************************************************************/
+
+class BuildView
+{
+   public static final int HUMAN_INDEX = 1;
+   public static final int COMP_INDEX = 0;
+   public static final int STACK_BASE_INDEX = 100;
+   public static final int BUTTON_INDEX = 200;
+   public static final int TIMER_BUTTON_INDEX = 50;
+
+   private int numCardsPerHand;
+   private int numStacks;
+
+   private JPanel pnlComputerHand;
+   private JPanel pnlHumanHand;
+   private JPanel pnlPlayArea;
+
+   // panels in the play area
+   private JPanel stackPanel;
+   private JPanel humanPanel;
+   private JPanel computerPanel;
+   private JPanel scorePanel;
+   private JPanel theDeckPanel;
+
+   private JLabel[] computerLabels;
+   private JButton[] stackButtons;
+   private JButton[] humanCardButtons;
+   private JFrame myCardTable;
+
+   // Experimental by Dan
+   private TimerLabel autoTimer;
+   private JButton timerButton;
+   // Theme colors
+   private Color pokerGreen = new Color(53, 101, 77);
+   private Color gold = new Color(228, 131, 0);
+   private Color ruby = new Color(88, 7, 37);
+
+   /**
+    * Recives the timer from the controller
+    * 
+    * @param autoTimer
+    * @param threadCount
+    */
+   public void setTimerLabel(TimerLabel autoTimer)
+   {
+      this.autoTimer = autoTimer;
+      // this.timerCount = timerCount;
+      this.timerButton = autoTimer.toggleButton();
+   }
+
+   /**
+    * Returns timer object
+    * 
+    * @return autoTimer
+    */
+   public TimerLabel getTimerLabel()
+   {
+      return autoTimer;
+   }
+
+   /**
+    * Constructor that takes the number of cards per hand and number of players
+    * 
+    * @param numCardsPerHand
+    * @param numPlayers
+    */
+   public BuildView(int numCardsPerHand, int numPlayers, int numStacks)
+   {
+      this.numCardsPerHand = numCardsPerHand;
+      // this.numPlayers = numPlayers;
+      this.numStacks = numStacks;
+   }
+
+   /**
+    * Sets up the card table with panels for each player and a playing area
+    */
+   public void createTable()
+   {
+      computerLabels = new JLabel[numCardsPerHand];
+      stackButtons = new JButton[numStacks];
+      humanCardButtons = new JButton[numCardsPerHand];
+
+      // Establish main frame in which program will run
+      myCardTable = new JFrame("Build Game");
+
+      // Update the frame's display
+      myCardTable.setLayout(new BorderLayout());
+      myCardTable.setSize(800, 600);
+      myCardTable.setLocationRelativeTo(null);
+      myCardTable.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      // field panels defined
+      pnlComputerHand = new JPanel();
+      pnlHumanHand = new JPanel();
+      pnlPlayArea = new JPanel();
+
+      // Set up layout for panels
+      pnlPlayArea.setLayout(new BorderLayout());
+      pnlHumanHand.setLayout(new FlowLayout(FlowLayout.CENTER));
+      pnlComputerHand.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+      // define panels for the play area
+      stackPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      humanPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      computerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      scorePanel = new JPanel(new GridLayout(3, 1));
+      theDeckPanel = new JPanel(new CardLayout());
+
+      // forces the sizes to keep the panels even
+      theDeckPanel.setPreferredSize(new Dimension(150, 200));
+      scorePanel.setPreferredSize(new Dimension(150, 200));
+
+      // set background color
+      pnlPlayArea.setBackground(pokerGreen);
+      pnlHumanHand.setBackground(pokerGreen);
+      pnlComputerHand.setBackground(pokerGreen);
+      stackPanel.setBackground(pokerGreen);
+      computerPanel.setBackground(pokerGreen);
+      humanPanel.setBackground(pokerGreen);
+      theDeckPanel.setBackground(pokerGreen);
+
+      // place panels on the play area
+      pnlPlayArea.add(stackPanel, BorderLayout.CENTER);
+      pnlPlayArea.add(computerPanel, BorderLayout.NORTH);
+      pnlPlayArea.add(humanPanel, BorderLayout.SOUTH);
+      pnlPlayArea.add(scorePanel, BorderLayout.EAST);
+      pnlPlayArea.add(theDeckPanel, BorderLayout.WEST);
+
+      // place panels on grid
+      myCardTable.add(pnlPlayArea, BorderLayout.CENTER);
+      myCardTable.add(pnlComputerHand, BorderLayout.NORTH);
+      myCardTable.add(pnlHumanHand, BorderLayout.SOUTH);
+
+      // labels the borders and sets the colors
+      TitledBorder playAreaBorder = new TitledBorder("Community");
+      playAreaBorder.setTitleColor(gold);
+      pnlPlayArea.setBorder(playAreaBorder);
+
+      TitledBorder compHandBorder = new TitledBorder("Computer");
+      compHandBorder.setTitleColor(gold);
+      pnlComputerHand.setBorder(compHandBorder);
+
+      TitledBorder playerHandBorder = new TitledBorder("You");
+      playerHandBorder.setTitleColor(gold);
+      pnlHumanHand.setBorder(playerHandBorder);
+
+      // show everything to the user
+      myCardTable.setVisible(true);
+   }
+
+   public void createComputerStatus()
+   {
+      computerPanel.setVisible(false);
+      JLabel status = new JLabel("Computer Status", JLabel.CENTER);
+      status.setForeground(gold);
+      computerPanel.add(status);
+      computerPanel.setVisible(true);
+   }
+
+   public void createHumanButton(ActionListener buttonListener)
+   {
+      humanPanel.setVisible(false);
+      JButton button = new JButton("I can't play");
+      button.setPreferredSize(new Dimension(135, 30));
+      // button.setBackground(ruby);
+      // button.setForeground(Color.WHITE);
+      button.setActionCommand(Integer.toString(BUTTON_INDEX));
+      button.addActionListener(buttonListener);
+      humanPanel.add(button);
+
+      timerButton.addActionListener(buttonListener);
+      timerButton.setText("Start/Stop Timer");
+      timerButton.setPreferredSize(new Dimension(135, 30));
+      // timerButton.setBackground(ruby);
+      // timerButton.setForeground(Color.white);
+      timerButton.setActionCommand(Integer.toString(TIMER_BUTTON_INDEX));
+      humanPanel.add(timerButton);
+
+      humanPanel.setVisible(true);
+   }
+
+   /**
+    * Creates and displays the card labels on the computer panel
+    * 
+    * @param icon
+    * @param numCompCards
+    */
+   public void createCompLabels(Icon icon, int numCompCards)
+   {
+      // Clear any old data
+      pnlComputerHand.removeAll();
+      pnlComputerHand.setVisible(false);
+
+      // Create the labels
+      for (int card = 0; card < numCompCards; card++)
+      {
+         // Create back labels for all the computer's cards
+         computerLabels[card] = new JLabel(icon);
+
+         // add computer's card labels to the table
+         pnlComputerHand.add(computerLabels[card]);
+      }
+      myCardTable.setVisible(true);
+      pnlComputerHand.setVisible(true);
+   }
+
+   public void updateCompStatus(String status)
+   {
+      computerPanel.setVisible(false);
+      computerPanel.removeAll();
+      JLabel label = new JLabel(status, JLabel.CENTER);
+      label.setForeground(gold);
+      computerPanel.add(label);
+      computerPanel.setVisible(true);
+   }
+
+   /**
+    * Creates and displays the card buttons on the human panel
+    * 
+    * @param cardIcons
+    * @param buttonListener
+    */
+   public void createHumanLabels(Icon[] cardIcons,
+      ActionListener buttonListener)
+   {
+      // Clear any old data
+      pnlHumanHand.removeAll();
+      pnlHumanHand.setVisible(false);
+
+      // Create the buttons for each card
+      for (int index = 0; index < cardIcons.length; index++)
+      {
+         // Create buttons for each of the human cards
+         humanCardButtons[index] = new JButton(cardIcons[index]);
+         humanCardButtons[index].setPreferredSize(new Dimension(73, 97));
+         humanCardButtons[index].setBorder(BorderFactory.createLineBorder(
+            Color.black));
+         humanCardButtons[index].setActionCommand(Integer.toString(index));
+         humanCardButtons[index].addActionListener(buttonListener);
+
+         // add human's card buttons to the table
+         pnlHumanHand.add(humanCardButtons[index]);
+      }
+      myCardTable.setVisible(true);
+      pnlHumanHand.setVisible(true);
+   }
+
+   public void createStackButton(Icon[] cardIcons,
+      ActionListener buttonListener)
+   {
+      // Clear any old data
+      stackPanel.removeAll();
+      stackPanel.setVisible(false);
+
+      // Create the buttons for each card
+      for (int index = 0; index < cardIcons.length; index++)
+      {
+         // Create buttons for each of the stack buttons
+         stackButtons[index] = new JButton(cardIcons[index]);
+         stackButtons[index].setPreferredSize(new Dimension(73, 97));
+         stackButtons[index].setActionCommand(Integer.toString(index
+            + STACK_BASE_INDEX));
+         stackButtons[index].addActionListener(buttonListener);
+
+         stackPanel.add(stackButtons[index]);
+      }
+      myCardTable.setVisible(true);
+      stackPanel.setVisible(true);
+   }
+
+   /**
+    * Creates the Deck Labels
+    * 
+    * @param deckImage
+    */
+   public void createDeckLabels(Icon deckImage)
+   {
+      theDeckPanel.add(new JLabel(deckImage));
+      theDeckPanel.setVisible(true);
+   }
+
+   /**
+    * clears the deck panel
+    */
+   public void clearDeckLabels()
+   {
+      theDeckPanel.removeAll();
+      theDeckPanel.setVisible(false);
+   }
+
+   public void createScoreLabels(int compScore, int humScore)
+   {
+      scorePanel.removeAll();
+      scorePanel.setVisible(false);
+      scorePanel.setBackground(pokerGreen);
+
+      autoTimer.setForeground(Color.WHITE);
+      // autoTimer.setText(threadCount.run());
+      scorePanel.add(autoTimer);
+
+      String text = "   Computer Score: " + compScore + "     ";
+      JLabel compLabel = new JLabel(text, JLabel.CENTER);
+      compLabel.setForeground(gold);
+      scorePanel.add(compLabel);
+
+      String text1 = "Your Score: " + humScore;
+      JLabel humLabel = new JLabel(text1, JLabel.CENTER);
+      humLabel.setForeground(gold);
+      scorePanel.add(humLabel);
+
+      scorePanel.setVisible(true);
+   }
+
+   public void changeStackIcon(int stackIndex, Icon stackIcon)
+   {
+      stackPanel.setVisible(false);
+      stackButtons[stackIndex].setIcon(stackIcon);
+      // stackPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+      stackPanel.setVisible(true);
+   }
+
+   public void highlightCard(int cardIndex)
+   {
+      humanCardButtons[cardIndex].setBorder(BorderFactory.createMatteBorder(1,
+         5, 5, 1, Color.orange));
+   }
+
+   public void unhighlightCard(int cardIndex)
+   {
+      humanCardButtons[cardIndex].setBorder(BorderFactory.createLineBorder(
+         Color.black));
+   }
+
+   /**
+    * Creates a pop up window to display who won the whole game
+    * 
+    * @param compScore
+    * @param humanScore
+    */
+   public void displayWinner(int compScore, int humanScore)
+   {
+      String compWinner = "Computers win! " + compScore + " vs " + humanScore;
+      String humanWinner = "Humans win! " + humanScore + " vs " + compScore;
+      String tie = humanScore + " vs " + compScore;
+      // computer wins scenario
+      if (compScore < humanScore)
+      {
+         // the low score wins
+         JOptionPane.showMessageDialog(myCardTable, new JLabel(compWinner,
+            JLabel.CENTER), "01010111 01001001 01001110",
+            JOptionPane.PLAIN_MESSAGE);
+      }
+      // human wins scenario
+      else if (humanScore < compScore)
+      {
+         JOptionPane.showMessageDialog(myCardTable, new JLabel(humanWinner,
+            JLabel.CENTER), "Humans Rule and Robots Drool!",
+            JOptionPane.PLAIN_MESSAGE);
+      }
+      // tie scenario
+      else
+      {
+         JOptionPane.showMessageDialog(myCardTable, new JLabel(tie,
+            JLabel.CENTER), "IT'S A TIE", JOptionPane.PLAIN_MESSAGE);
+      }
+   }
+
+   // accessors
+   public int getNumCardsPerHand()
+   {
+      return numCardsPerHand;
+   }
+
+}
+
+@SuppressWarnings("serial")
+class TimerLabel extends JLabel
+{
+   Timer timerCount;
+   private JButton timerButton = new JButton();
+
+   /**
+    * default constructor
+    */
+   public TimerLabel()
+   {
+      // timerButton.addActionListener(this);
+      this.setHorizontalAlignment(SwingConstants.CENTER);
+      setFont(new Font("Adobe Caslon", Font.BOLD, 25));
+   }
+
+   /**
+    * constuctor allows creation of start of time
+    */
+   public TimerLabel(boolean startTimerNow, Timer timerCount)
+   {
+      this(); // call to the default constructor
+
+      if (startTimerNow)
+      {
+         timerCount.start();
+      }
+   }
+
+   /**
+    * @return a JButton start and stop the timer
+    */
+   public JButton toggleButton()
+   {
+      return timerButton;
+   }
+
+   /**
+    * resets timer to 0s
+    */
+   public boolean resetTimer()
+   {
+      this.timerCount.resetSec(0);
+      return true;
+   }
+}
+import javax.swing.*;
+import java.awt.event.*;
+
+/****************************************************************
+ * BuildController
+ * 
+ * Description: Manages both the BuildModel and BuildView objects Usage:
+ * Communicates between the view and model classes
+ *****************************************************************/
+
+class BuildController implements ActionListener
+{
+   private BuildModel theModel;
+   private BuildView theView;
+
+   private int HUMAN = 1; // Index for human hand
+   private int COMPUTER = 0; // Index for computer hand
+
+   private boolean humanPlayed = false; // human starts first
+   private boolean compPlayed = true; // computer still can play
+   private boolean humanTurn = true; // false for computer turn
+   private int humanCardIndex = -1; // no card is selected in human hand
+
+   private TimerLabel timerLabel;
+   private Timer timerCount;
+
+   /**
+    * Constructor that starts a new game using a model and a view
+    * 
+    * @param model
+    * @param view
+    */
+   public BuildController(BuildModel model, BuildView view)
+   {
+      theModel = model;
+      theView = view;
+
+      theModel.startNewGame();
+      theView.createTable();
+
+      theView.createComputerStatus();
+      loadTimer();
+      theView.createHumanButton(this);
+
+      loadBackOfDeckImage(); // create the deck
+      loadPlayerHands(); // display the computer and human hand
+      loadStack(); // display the stacks in playing area
+      loadScore(); // display score and timer
+   }
+
+   /**
+    * Display the scores
+    */
+   public void loadScore()
+   {
+      theView.createScoreLabels(theModel.getPlayerScore(COMPUTER), theModel
+         .getPlayerScore(HUMAN));
+   }
+
+   /**
+    * Load and display the computer and human's current hands onto the table
+    */
+   public void loadPlayerHands()
+   {
+      // Get info from the GameModel class
+      Icon[] playerIcons = theModel.loadHandIcons(HUMAN);
+      Icon compIcon = theModel.getBackCardIcon();
+      int numCompCards = theModel.getNumCardsInHand(COMPUTER);
+
+      // Display info with the GameView class
+      theView.createCompLabels(compIcon, numCompCards);
+      theView.createHumanLabels(playerIcons, this);
+   }
+
+   /**
+    * Load and display the specific hand onto the table
+    * 
+    * @param handIndex the index of the specific hand
+    */
+   public void loadPlayerHands(int handIndex)
+   {
+      // Get info from the GameModel class
+      Icon[] playerIcons = theModel.loadHandIcons(handIndex);
+
+      // Display info with the GameView class
+      theView.createHumanLabels(playerIcons, this);
+   }
+
+   /**
+    * Load and display the stack onto the table
+    */
+   public void loadStack()
+   {
+      // Get info from the GameModel class
+      Icon[] stackIcons = theModel.loadStackIcons();
+
+      // Display info with the GameView class
+      theView.createStackButton(stackIcons, this);
+   }
+
+   /**
+    * /* Load and display the deck onto the table Dan's Test creates a deck of
+    * 56 back of card icons
+    */
+   public void loadBackOfDeckImage()
+   {
+      theView.createDeckLabels(theModel.getBackCardIcon());
+   }
+
+   /**
+    * loads the timer on the right side of the table
+    */
+   public void loadTimer()
+   {
+      timerCount = new Timer();
+      timerLabel = new TimerLabel(true, timerCount);
+
+      theView.setTimerLabel(timerLabel);
+      timerCount.setJLabel(theView.getTimerLabel());
+   }
+
+   /**
+    * Action event that is fired every time the user clicks a card button
+    * 
+    * @param ActionEvent
+    */
+   @Override
+   public void actionPerformed(ActionEvent e)
+   {
+      // Get the card that the user clicked
+      String cardPlayed = e.getActionCommand();
+      int cardIndex = Integer.parseInt(cardPlayed);
+
+      if (cardIndex == BuildView.BUTTON_INDEX)
+      {
+         // Human can't play
+         humanNotPlay();
+      }
+      else if (cardIndex == BuildView.TIMER_BUTTON_INDEX)
+      {
+         // timer is toggled
+         if (timerCount.isAlive())
+         {
+            timerCount.stopThread();
+            timerCount = new Timer(timerCount.secElapsed());
+            timerCount.setJLabel(theView.getTimerLabel());
+         }
+         else
+         {
+            timerCount.start();
+         }
+      }
+      else if (cardIndex >= BuildView.STACK_BASE_INDEX)
+      {
+         // a stack is chosen
+         humanPlay(cardIndex - BuildView.STACK_BASE_INDEX);
+      }
+      else
+      {
+         // a card is chosen
+         selectCard(cardIndex);
+      }
+
+      if (!humanTurn)
+      {
+         // it is computer turn to play
+         computerPlay();
+      }
+   }
+
+   /**
+    * This is to check if the human did not play and then checks if the computer
+    * did not play as well and adds to their scores by 1 for not playing
+    */
+   private void humanNotPlay()
+   {
+      humanPlayed = false; // human can't play
+      humanTurn = false; // human turn is over
+      theModel.addScore(HUMAN); // increment the score
+      // display human score since it is changed
+      theView.createScoreLabels(theModel.getPlayerScore(COMPUTER), theModel
+         .getPlayerScore(HUMAN));
+
+      if (!compPlayed)
+      {
+         // computer did not play as well, need to reload the stacks
+         theModel.dealToStack();
+         if (theModel.isGameOver())
+         {
+            // not enough cards, game ends
+            endGame();
+         }
+         loadStack();
+         // new cards on stack, reset the flags for human and computer
+         humanPlayed = true;
+         compPlayed = true;
+      }
+   }
+
+   /**
+    * A card is selected from a hand
+    * 
+    * @param cardIndex
+    * 
+    */
+   private void selectCard(int cardIndex)
+   {
+      if (cardIndex >= 0 && cardIndex < theModel.getNumCardsInHand(HUMAN))
+      {
+         if (humanCardIndex >= 0)
+         {
+            // remove the highlight of previous selected card
+            theView.unhighlightCard(humanCardIndex);
+         }
+         // highlight the selected card
+         theView.highlightCard(cardIndex);
+         humanCardIndex = cardIndex;
+      }
+   }
+
+   /**
+    * The computer takes its turn and makes a move
+    */
+   private void computerPlay()
+   {
+      Card[] stack = theModel.getStack();
+      Hand computer = theModel.getHand(COMPUTER);
+      boolean found = false;
+      for (int i = 0; i < stack.length && !found; i++)
+      {
+         Card stackCard = stack[i];
+         int stackValue = Card.valueAsInt(stackCard);
+         for (int j = 0; j < computer.getNumCards() && !found; j++)
+         {
+            Card computerCard = computer.inspectCard(j);
+            int computerValue = Card.valueAsInt(computerCard);
+            if (Math.abs(stackValue - computerValue) == 1)
+            {
+               // found a computer card can place on the stack
+               found = true;
+
+               // replace the stack card with the computer card
+               theModel.setStackCard(i, computerCard);
+               Icon stackIcon = GUICard.getIcon(computerCard);
+               theView.changeStackIcon(i, stackIcon);
+
+               // play the computer card then take a card from deck
+               theModel.playCard(COMPUTER, j);
+               theModel.takeCard(COMPUTER);
+
+               // check if game is over
+               if (theModel.isGameOver())
+               {
+                  endGame();
+               }
+               else
+               {
+                  // game continues
+                  Icon compLabel = GUICard.getBackCardIcon(); // back side of
+                                                              // the card
+                  // Display info with the GameView class
+                  theView.createCompLabels(compLabel, theModel.getHand(COMPUTER)
+                     .getNumCards());
+
+                  // computer turn is done
+                  compPlayed = true;
+                  humanTurn = true;
+               }
+            }
+         }
+      }
+      if (!found)
+      {
+         // Computer can't play
+         compPlayed = false;
+         humanTurn = true; // computer turn is over
+         theModel.addScore(COMPUTER); // increment the score
+         // display human score since it is changed
+         theView.createScoreLabels(theModel.getPlayerScore(COMPUTER), theModel
+            .getPlayerScore(HUMAN));
+         theView.updateCompStatus("Computer Can't Play");
+
+         if (!humanPlayed)
+         {
+            // human did not play as well, need to reload the stacks
+            theModel.dealToStack();
+
+            // check if the game is over first
+            if (theModel.isGameOver())
+            {
+               // not enough cards, game ends
+               endGame();
+            }
+            loadStack(); // new stack cards
+            // new cards on stack, reset the flags for human and computer
+            humanPlayed = true;
+            compPlayed = true;
+
+         }
+
+      }
+      else
+      {
+         // show computer has played
+         theView.updateCompStatus("Computer Played");
+      }
+   }
+
+   /**
+    * the human takes the turn and makes its move on the specific stack
+    * 
+    * @param stackIndex
+    * 
+    */
+   private void humanPlay(int stackIndex)
+   {
+      if (humanCardIndex >= 0)
+      {
+         // card is selected to place on the stack
+         Card[] stack = theModel.getStack();
+         Hand hand = theModel.getHand(HUMAN);
+         Card stackCard = stack[stackIndex];
+         int stackValue = Card.valueAsInt(stackCard);
+         Card humanCard = hand.inspectCard(humanCardIndex);
+         int humanValue = Card.valueAsInt(humanCard);
+         if (Math.abs(stackValue - humanValue) == 1)
+         {
+            // the human card can place on the stack
+
+            // replace the stack card with human card
+            theModel.setStackCard(stackIndex, humanCard);
+            Icon stackIcon = GUICard.getIcon(humanCard);
+            theView.changeStackIcon(stackIndex, stackIcon);
+
+            // play the human card then take a card from deck
+            theModel.playCard(HUMAN, humanCardIndex);
+            theModel.takeCard(HUMAN);
+
+            if (theModel.isGameOver())
+            {
+               endGame();
+            }
+            else
+            {
+               // game continues
+               Icon[] playerIcons = theModel.loadHandIcons(HUMAN);
+               // Display info with the GameView class
+               theView.createHumanLabels(playerIcons, this);
+
+               // human turn is done
+               humanCardIndex = -1; // clear the selected card
+               humanPlayed = true;
+               humanTurn = false;
+            }
+         }
+         else
+         {
+            // do nothing now, may be a warning message dialog to tell how to
+            // play
+         }
+      }
+   }
+
+   /**
+    * Gets the final scores for each player and displays the the appropriate
+    * message.
+    */
+   private void endGame()
+   {
+      int humanScore = theModel.getPlayerScore(HUMAN);
+      int compScore = theModel.getPlayerScore(COMPUTER);
+      // ***********add a clear deck method here? - Dan
+      // ***********************************************/
+      theView.clearDeckLabels();
+      theView.displayWinner(compScore, humanScore);
+
+      System.exit(0);
+
+   }
+
 }
